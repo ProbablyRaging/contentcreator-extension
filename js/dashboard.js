@@ -307,7 +307,7 @@ function setupDashboardPage() {
     // Cycle through button states when clicked
     button.addEventListener('click', function () {
         if (!disabled) {
-            chrome.runtime.sendMessage({ queue: true }).then(() => { if (chrome.runtime.lastError) return; });
+            chrome.runtime.sendMessage({ queue: true }, () => { if (chrome.runtime.lastError) return; });
             disabled = true;
             // Loading stage
             button.classList.add('loading');

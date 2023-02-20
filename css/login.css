@@ -30,6 +30,12 @@
     filter: brightness(0.9);
 }
 
+.btn:active,
+.btn:focus-visible {
+    background-color: #272b3e !important;
+}
+
 .btn:disabled {
     background-color: #1f2335;
+    filter: brightness(0.8);
 }

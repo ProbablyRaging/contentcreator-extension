@@ -20,8 +20,8 @@ function checkLoginPage() {
 function setupLoginPage() {
     const authButton = document.getElementById('discordAuth');
     authButton.addEventListener('click', function () {
-        chrome.runtime.sendMessage({ login: true });
-        authButton.innerHTML = 'Please keep this window open';
+        chrome.runtime.sendMessage({ login: true }, () => { if (chrome.runtime.lastError) return; });
+        authButton.innerHTML = 'Authenticating..';
         authButton.disabled = true;
     });
 

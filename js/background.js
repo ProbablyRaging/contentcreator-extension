@@ -69,7 +69,7 @@ function checkAuthState(window) {
 }
 
 function handleAuthentication(success) {
-    chrome.runtime.sendMessage({ success }).then(() => {
+    chrome.runtime.sendMessage({ success }, () => {
         if (chrome.runtime.lastError) return;
     });
 }
