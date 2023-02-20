@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+:root {
+    --font: #f6f6f6;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background-clip: padding-box !important;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    background: var(--footerbg);
+}
+
+::selection {
+    background-color: rgba(39, 197, 255, 0.387);
+}
+
+html {
+    height: fit-content;
+    width: fit-content;
+    max-width: 800px;
+    max-height: 600px;
+    overflow: hidden;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
+    color: var(--font) !important;
+    font-weight: 600 !important;
+    background-color: #17181a !important;
+    background-image: url('../assets/images/waves.svg');
+    margin: 0 !important;
+    font-size: 12px !important;
+    user-select: none;
+    width: 360px;
+    height: 275px;
+}
+
+* {
+    box-sizing: revert;
+}
+
+a {
+    color: var(--font);
+}
+
+a:hover {
+    color: unset;
+    filter: brightness(0.9);
+}
+
+p {
+    margin-block: 1rem;
+    cursor: text;
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+    user-select: none;
+}
+
+.header img {
+    width: 34px;
+    background: #183d63;
+    padding: 12px;
+    border-radius: 25%;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    position: relative;
+    gap: 28px;
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
+
+.footer input {
+    display: none;
+    font-size: 14px;
+    background-color: #00000094;
+    border-radius: 10px;
+    border: 1px #0f0f10 solid;
+    padding: 4px 6px;
+    color: #fff;
+    margin-left: 6px;
+    width: 100%;
+}
+
+.footer input:focus-visible {
+    outline: 1px #383838 solid;
+}
+
+.footer input::placeholder {
+    color: #484848;
+}
+
+.loader-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.loader {
+    border: 2px solid #444950;
+    border-radius: 50%;
+    border-top: 2px solid #3498db;
+    width: 24px;
+    height: 24px;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+.disabled {
+    filter: brightness(0.5);
+    cursor: default !important;
+}

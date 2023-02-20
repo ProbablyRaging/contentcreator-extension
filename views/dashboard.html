@@ -1,0 +1,64 @@
+<body>
+    <div id="dashboardFadeIn" class="dashboard">
+        <div class="title">
+            <p class="title-welcome">Welcome, data.result.username</p>
+        </div>
+
+        <div class="content-container">
+            <p id="containerBody" class="container-body">Begin watching your queue to earn tokens</p>
+        </div>
+
+        <div class="play-button">
+            <button id="button" class="ready">
+                <div class="message submitMessage">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13 12.2">
+                        <polyline stroke="currentColor" points="2,7.1 6.5,11.1 11,7.1 " />
+                        <line stroke="currentColor" x1="6.5" y1="1.2" x2="6.5" y2="10.3" />
+                    </svg>
+                    <span class="button-text">Play Queue</span>
+                </div>
+                <div class="message loadingMessage">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 17">
+                        <circle class="loadingCircle" cx="2.2" cy="10" r="1.6" />
+                        <circle class="loadingCircle" cx="9.5" cy="10" r="1.6" />
+                        <circle class="loadingCircle" cx="16.8" cy="10" r="1.6" />
+                    </svg>
+                </div>
+                <div class="message successMessage">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13 11">
+                        <polyline stroke="currentColor" points="1.4,5.8 5.1,9.5 11.6,2.1 " />
+                    </svg>
+                    <span class="button-text">Queue Playing</span>
+                </div>
+            </button>
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="footer">
+            <p id="input-error" class="input-error"></p>
+            <input id="createInput" type="text" placeholder="Enter video URL or ID"></input>
+            <div id="createBtn" class="create" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Submit new video link">
+                <i class="bi bi-plus-lg"></i>
+            </div>
+            <div id="sendCreateBtn" class="create hidden">
+                <i class="bi bi-send-fill"></i>
+            </div>
+            <div id="endCreateBtn" class="create hidden">
+                <i class="bi bi-x-lg"></i>
+            </div>
+
+            <div id="refreshBtn" class="create" data-bs-toggle="tooltip" data-bs-title="Refresh to update token count">
+                <i class="bi bi-arrow-clockwise"></i>
+            </div>
+
+            <div class="currency">
+                <div class="blob">
+                    <p id="tokenData" class="tokens-data">data.result.tokens</p> <img src="../assets/images/tokens.png">
+                </div>
+                <div class="blob">
+                    <p class="crowns-data">0</p> <img src="../assets/images/crowns.png">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

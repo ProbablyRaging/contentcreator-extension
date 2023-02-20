@@ -1,0 +1,35 @@
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.login-items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100px;
+    border: none;
+    padding: 12px 26px;
+    background-color: #1f2335;
+    font-family: 'Roboto', Arial;
+    font-size: 14px;
+    font-weight: 500;
+    height: 40px;
+    transition: filter 0.2s ease;
+}
+
+.btn:hover {
+    background-color: #1f2335;
+    filter: brightness(0.9);
+}
+
+.btn:disabled {
+    background-color: #1f2335;
+}
