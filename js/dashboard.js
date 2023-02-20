@@ -105,7 +105,7 @@ function setupDashboardPage() {
         // Check the user's tokens
         const { userId } = await chrome.storage.sync.get(['userId']);
         $.ajax({
-            url: 'http://localhost/api/getuser',
+            url: 'http://54.252.72.200/api/getuser',
             type: 'POST',
             data: {
                 userId: userId,
@@ -122,7 +122,7 @@ function setupDashboardPage() {
                 } else {
                     // Get the value of the input field and make post request
                     $.ajax({
-                        url: 'http://localhost/api/submitvideoid',
+                        url: 'http://54.252.72.200/api/submitvideoid',
                         type: 'POST',
                         data: {
                             videoId: inputText,

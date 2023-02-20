@@ -48,7 +48,7 @@ function checkAuthState(window) {
         if (tab.url.includes('auth/success?user')) {
             const params = new URLSearchParams(tab.url.split('?')[1]);
             const userId = params.get('user');
-            fetch('http://localhost/api/getuser', {
+            fetch('http://54.252.72.200/api/getuser', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: userId })
@@ -86,7 +86,7 @@ async function getQueueAndPlay(tabId) {
     // If there are no videos in the list
     if (!videoIds || videoIds.length < 1) {
         try {
-            chrome.tabs.update(tabId, { url: `http://localhost/error/emptyqueue` });
+            chrome.tabs.update(tabId, { url: `http://54.252.72.200/error/emptyqueue` });
         } catch (err) {
             console.log('There was a problem : ', err);
         }
@@ -111,7 +111,7 @@ async function getQueueAndPlay(tabId) {
             // If no more videos are available, navigate to the queue finished page
             clearInterval(monitorCheck);
             try {
-                chrome.tabs.update(tabId, { url: `http://localhost/success/queuefinished` });
+                chrome.tabs.update(tabId, { url: `http://54.252.72.200/success/queuefinished` });
             } catch (err) {
                 console.log('There was a problem : ', err);
             }
@@ -180,7 +180,7 @@ function awarkToken(tabId) {
         // Retrieve the user ID from storage
         const { userId } = await chrome.storage.sync.get(['userId']);
         // Send a request to the server to add a token to the user's account
-        fetch('http://localhost/api/addtokens', {
+        fetch('http://54.252.72.200/api/addtokens', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: userId, amount: 1 })
@@ -189,7 +189,7 @@ function awarkToken(tabId) {
 }
 
 async function randomlySelectVideos() {
-    const response = await fetch('http://localhost/api/videolist', {
+    const response = await fetch('http://54.252.72.200/api/videolist', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
     });
