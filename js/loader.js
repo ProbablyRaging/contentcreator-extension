@@ -1,77 +1,47 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // Check if user has an active session
     const { userId } = await chrome.storage.sync.get(['userId']);
-    setTimeout(() => {
-        fetch('http://localhost/api/getuser', {
+    setTimeout(async () => {
+        const response = await fetch('http://localhost/api/getuser', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: userId })
-        }).then(response => response.json())
-            .then(data => {
-                const body = document.body;
-                console.log(data.result.username);
-                if (data.result) {
-                    if (new Date().valueOf() < data.result.expires) {
-                        $('head').find('link[href="../css/login.css"]').remove();
-                        // $('body').find('script[src="../js/login.js"]').remove();
-                        $(body).animate({ opacity: 0 }, 300).promise().then(() => {
-                            $.ajax({
-                                url: '../views/dashboard.html',
-                                success: function (res) {
-                                    // Extract the content
-                                    const parser = new DOMParser();
-                                    const responseDoc = parser.parseFromString(res, 'text/html');
-                                    let newBody = $(responseDoc).find('body').html();
-                                    newBody = newBody.replace('data.result.username', data.result.username);
-                                    newBody = newBody.replace('data.result.tokens', data.result.tokens || 0);
-                                    // Replace the current page's content
-                                    $('page-content').html(newBody);
-                                    $('page-content').attr('page', 'dashboard');
-                                    $(body).animate({ opacity: 1 }, 300);
-                                }
-                            });
-                        });
-                    } else {
-                        $('head').find('link[href="../css/dashboard.css"]').remove();
-                        // $('body').find('script[src="../js/dashboard.js"]').remove();
-                        $(body).animate({ opacity: 0 }, 300).promise().then(() => {
-                            $.ajax({
-                                url: '../views/login.html',
-                                success: function (res) {
-                                    // Extract the content
-                                    const parser = new DOMParser();
-                                    const responseDoc = parser.parseFromString(res, 'text/html');
-                                    const newBody = $(responseDoc).find('body').html();
+        });
 
-                                    // Replace the current page's content
-                                    $('page-content').html(newBody);
-                                    $('page-content').attr('page', 'login');
-                                    $(body).animate({ opacity: 1 }, 300);
-                                }
-                            });
-                        });
+        const data = await response.json();
+        const body = document.body;
+
+        if (data.result && new Date().valueOf() < data.result.expires) {
+            cssToRemove = 'link[href="../css/login.css"]';
+            viewPage = '../views/dashboard.html';
+        } else {
+            cssToRemove = 'link[href="../css/dashboard.css"]';
+            viewPage = '../views/login.html';
+        }
+
+        $('head').find(cssToRemove).remove();
+        $(body).animate({ opacity: 0 }, 300).promise().then(() => {
+            $.ajax({
+                url: viewPage,
+                success: function (res) {
+                    // Extract the content
+                    const parser = new DOMParser();
+                    const responseDoc = parser.parseFromString(res, 'text/html');
+                    let newBody = $(responseDoc).find('body').html();
+                    // Replace the current page's content
+                    if (viewPage.includes('dashboard')) {
+                        newBody = newBody.replace('data.result.username', data.result.username);
+                        newBody = newBody.replace('data.result.tokens', data.result.tokens || 0);
+                        $('page-content').html(newBody);
+                        $('page-content').attr('page', 'dashboard');
                     }
-                } else {
-                    $('head').find('link[href="../css/dashboard.css"]').remove();
-                    // $('body').find('script[src="../js/dashboard.js"]').remove();
-                    $(body).animate({ opacity: 0 }, 300).promise().then(() => {
-                        $.ajax({
-                            url: '../views/login.html',
-                            success: function (res) {
-                                // Extract the content
-                                const parser = new DOMParser();
-                                const responseDoc = parser.parseFromString(res, 'text/html');
-                                const newBody = $(responseDoc).find('body').html();
-
-                                // Replace the current page's content
-                                $('page-content').html(newBody);
-                                $('page-content').attr('page', 'login');
-                                $(body).animate({ opacity: 1 }, 300);
-                            }
-                        });
-                    });
+                    if (viewPage.includes('login')) {
+                        $('page-content').html(newBody);
+                        $('page-content').attr('page', 'login');
+                    }
+                    $(body).animate({ opacity: 1 }, 300);
                 }
             });
+        });
     }, 700);
 });
-
