@@ -5,7 +5,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.login) {
         // Create a popup window for Discord authentication
         chrome.windows.create({
-            url: 'https://discord.com/api/oauth2/authorize?client_id=977292001718464592&redirect_uri=http%3A%2F%2Flocalhost%2Fauth%2Fredirect&response_type=code&scope=guilds%20identify',
+            url: 'https://discord.com/api/oauth2/authorize?client_id=977292001718464592&redirect_uri=http://54.252.72.200/auth/redirect&response_type=code&scope=guilds%20identify',
             focused: true,
             type: 'popup',
             width: 600,
@@ -22,7 +22,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         chrome.windows.create({
             url: 'https://www.youtube.com/',
             focused: true,
-            type: 'popup',
+            type: 'panel',
             width: 600,
             height: 800,
         }, function (window) {
