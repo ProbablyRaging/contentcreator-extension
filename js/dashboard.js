@@ -129,7 +129,6 @@ function setupDashboardPage() {
                             userId: userId
                         },
                         success: function (res) {
-                            console.log(res);
                             if (res.error) {
                                 inputError.innerText = res.error;
                                 setTimeout(() => {
@@ -187,9 +186,9 @@ function setupDashboardPage() {
     const terminalVelocity = 3;
     // Colors, back side is darker for confetti flipping
     const colors = [
-        { front: '#7b5cff', back: '#6245e0' }, // Purple
-        { front: '#b3c7ff', back: '#8fa5e5' }, // Light Blue
-        { front: '#5c86ff', back: '#345dd1' }  // Darker Blue
+        { front: '#FA7268', back: '#398ac7' },
+        { front: '#B1356A', back: '#FA7268' },
+        { front: '#C62368', back: '#398ac7' } 
     ];
     // Helper function to pick a random number within a range
     randomRange = (min, max) => Math.random() * (max - min) + min;

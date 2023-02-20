@@ -28,7 +28,6 @@ function getVideoDuration() {
         const durationMs = (minutes * 60 + seconds) * 1000;
         // Limit the duration to 10 minutes
         const returnedDuration = durationMs > 600000 ? 600000 : durationMs;
-        console.log(returnedDuration);
         return returnedDuration;
     } else {
         // If the duration string is not found, wait amd try again

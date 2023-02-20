@@ -28,6 +28,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }, function (window) {
             // Stop executing if the window is closed
             if (chrome.runtime.lastError) return;
+            // Mute the tab
+            try {
+                chrome.tabs.update(window.tabs[0].id, { muted: true });
+            } catch (err) {
+                console.log('There was a problem : ', err);
+            }
             getQueueAndPlay(window.tabs[0].id);
         });
     }
@@ -76,9 +82,9 @@ function handleAuthentication(success) {
 
 let monitorCheck;
 async function getQueueAndPlay(tabId) {
-    const videoIds = await randomlySelectFiveVideos();
+    const videoIds = await randomlySelectVideos();
     // If there are no videos in the list
-    if (!videoIds) {
+    if (!videoIds || videoIds.length < 1) {
         try {
             chrome.tabs.update(tabId, { url: `http://localhost/error/emptyqueue` });
         } catch (err) {
@@ -99,7 +105,7 @@ async function getQueueAndPlay(tabId) {
                 likeVideo(tab);
                 index++;
                 const skipToNext = await getVideoDuration(tab);
-                setTimeout(openTab, skipToNext);
+                setTimeout(openTab, 5000);
             });
         } else {
             // If no more videos are available, navigate to the queue finished page
@@ -121,7 +127,6 @@ function initMonitoring(tab) {
         // If the user closes the tab early, stop monitoring
         chrome.tabs.get(tab.id, function (tab) {
             if (chrome.runtime.lastError) {
-                console.log('User closed tab');
                 return clearInterval(monitorCheck);
             }
         });
@@ -183,7 +188,7 @@ function awarkToken(tabId) {
     });
 }
 
-async function randomlySelectFiveVideos() {
+async function randomlySelectVideos() {
     const response = await fetch('http://localhost/api/videolist', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
@@ -192,10 +197,8 @@ async function randomlySelectFiveVideos() {
     // Check if the response has a "videoList" property
     if (data.videoList) {
         const selectedVideos = [];
-        // Determine the number of videos to select
-        const listLength = data.videoList.length < 5 ? data.videoList.length : 5;
         // Select 5 random videos
-        for (let i = 0; i < listLength; i++) {
+        for (let i = 0; i < data.videoList.length; i++) {
             const randomIndex = Math.floor(Math.random() * data.videoList.length);
             const randomVideoId = data.videoList[randomIndex];
             // Check that the video hasn't already been selected

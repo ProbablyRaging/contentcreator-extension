@@ -43,6 +43,7 @@ body {
     user-select: none;
     width: 360px;
     height: 275px;
+    -webkit-font-smoothing: antialiased;
 }
 
 * {
@@ -84,35 +85,6 @@ p {
     height: 100%;
     position: relative;
     gap: 28px;
-}
-
-.footer {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-}
-
-.footer input {
-    display: none;
-    font-size: 14px;
-    background-color: #00000094;
-    border-radius: 10px;
-    border: 1px #0f0f10 solid;
-    padding: 4px 6px;
-    color: #fff;
-    margin-left: 6px;
-    width: 100%;
-}
-
-.footer input:focus-visible {
-    outline: 1px #383838 solid;
-}
-
-.footer input::placeholder {
-    color: #484848;
 }
 
 .loader-wrapper {
