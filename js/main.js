@@ -7,6 +7,10 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
     if (message.getDuration) {
         sendResponse(getVideoDuration());
     }
+    // Block tab interaction
+    if (message.blockTab) {
+        blockTabInteractions();
+    }
 });
 
 function findAndClickLikeButton() {
@@ -33,4 +37,40 @@ function getVideoDuration() {
         // If the duration string is not found, wait amd try again
         setTimeout(getVideoDuration, 1000);
     }
+}
+
+function blockTabInteractions() {
+    let count = 0;
+    let staticStyles;
+    const checker = setInterval(() => {
+        let interactionBlocker = document.getElementById('interactionBlocker');
+        if (!interactionBlocker) {
+            interactionBlocker = document.createElement('interaction-blocker');
+            interactionBlocker.id = 'interactionBlocker';
+            interactionBlocker.style.position = 'fixed';
+            interactionBlocker.style.top = '0';
+            interactionBlocker.style.left = '0';
+            interactionBlocker.style.width = '100%';
+            interactionBlocker.style.height = '100%';
+            interactionBlocker.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+            interactionBlocker.style.zIndex = '999999';
+            document.body.appendChild(interactionBlocker);
+        }
+        const checkStyles = document.getElementById('interactionBlocker').getAttribute('style');
+        if (count < 1) staticStyles = checkStyles;
+        if (staticStyles !== checkStyles) {
+            clearInterval(checker);
+            interactionBlocker.id = 'interactionBlocker';
+            interactionBlocker.style.position = 'fixed';
+            interactionBlocker.style.top = '0';
+            interactionBlocker.style.left = '0';
+            interactionBlocker.style.width = '100%';
+            interactionBlocker.style.height = '100%';
+            interactionBlocker.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+            interactionBlocker.style.zIndex = '999999';
+            blockTabInteractions();
+            return;
+        }
+        count++;
+    }, 1000);
 }

@@ -103,6 +103,7 @@ async function getQueueAndPlay(tabId) {
                 if (chrome.runtime.lastError) return;
                 if (!monitorCheck) initMonitoring(tab);
                 likeVideo(tab);
+                blockTabInteractions(tab);
                 index++;
                 const skipToNext = await getVideoDuration(tab);
                 setTimeout(openTab, skipToNext);
@@ -171,6 +172,23 @@ async function getVideoDuration(tab) {
             });
         }, 1000);
     });
+}
+
+function blockTabInteractions(tab) {
+    // Set up an interval to check if the tab is still open
+    const statusCheck = setInterval(() => {
+        // If the user closes the tab early, exit the function
+        chrome.tabs.get(tab.id, function (tab) {
+            if (chrome.runtime.lastError) return;
+            // If the tab has finished loading
+            if (tab.status === 'complete') {
+                // Send a message to the content script to like the video
+                chrome.tabs.sendMessage(tab.id, { blockTab: true });
+                // Clear the interval to stop checking if the tab is still open
+                clearInterval(statusCheck);
+            }
+        });
+    }, 1000);
 }
 
 function awarkToken(tabId) {
