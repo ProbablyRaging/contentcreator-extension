@@ -84,6 +84,7 @@ async function getQueueAndPlay(tabId) {
         } catch (err) {
             console.log('There was a problem : ', err);
         }
+        return;
     }
     let index = 0;
     function openTab() {
@@ -92,18 +93,19 @@ async function getQueueAndPlay(tabId) {
         // Get the availavble video IDs, navigate to the video watch page and watch
         // the video for 10 minutes before moving on to the next video in the list
         if (index < videoIds.length) {
-            chrome.tabs.update(tabId, { url: `https://www.youtube.com/watch?v=${videoIds[index]}` }, function (tab) {
+            chrome.tabs.update(tabId, { url: `https://www.youtube.com/watch?v=${videoIds[index]}` }, async function (tab) {
                 if (chrome.runtime.lastError) return;
                 if (!monitorCheck) initMonitoring(tab);
                 likeVideo(tab);
                 index++;
-                setTimeout(openTab, 10000);
+                const skipToNext = await getVideoDuration(tab);
+                setTimeout(openTab, skipToNext);
             });
         } else {
             // If no more videos are available, navigate to the queue finished page
             clearInterval(monitorCheck);
             try {
-                chrome.tabs.update(tabId, { url: `http://localhost/error/queuefinished` });
+                chrome.tabs.update(tabId, { url: `http://localhost/success/queuefinished` });
             } catch (err) {
                 console.log('There was a problem : ', err);
             }
@@ -143,24 +145,27 @@ function likeVideo(tab) {
     }, 1000);
 }
 
-function getVideoDuration(tab) {
-    // Set up a status check interval that runs every second
-    const statusCheck = setInterval(() => {
-        // Get the current state of the tab
-        chrome.tabs.get(tab.id, function (tab) {
-            // If an error occurred, return without doing anything
-            if (chrome.runtime.lastError) return;
-            // Check if the tab has finished loading
-            if (tab.status === 'complete') {
-                // Send a message to the content script to get the video duration
-                chrome.tabs.sendMessage(tab.id, { getDuration: true }, function (response) {
-                    // Once a response is received, clear the status check interval and return the response
-                    clearInterval(statusCheck);
-                    return response;
-                });
-            }
-        });
-    }, 1000);
+async function getVideoDuration(tab) {
+    return new Promise((resolve) => {
+        // Set up a status check interval that runs every second
+        const statusCheck = setInterval(() => {
+            // Get the current state of the tab
+            chrome.tabs.get(tab.id, async function (tab) {
+                // If an error occurred, return without doing anything
+                if (chrome.runtime.lastError) return;
+                // Check if the tab has finished loading
+                if (tab.status === 'complete') {
+                    // Send a message to the content script to get the video duration
+                    await chrome.tabs.sendMessage(tab.id, { getDuration: true }, function (response) {
+                        if (chrome.runtime.lastError) return;
+                        // Once a response is received, clear the status check interval and resolve the Promise with the response
+                        clearInterval(statusCheck);
+                        resolve(response);
+                    });
+                }
+            });
+        }, 1000);
+    });
 }
 
 function awarkToken(tabId) {
@@ -170,7 +175,7 @@ function awarkToken(tabId) {
         // Retrieve the user ID from storage
         const { userId } = await chrome.storage.sync.get(['userId']);
         // Send a request to the server to add a token to the user's account
-        fetch('http://api/addtokens', {
+        fetch('http://localhost/api/addtokens', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: userId, amount: 1 })

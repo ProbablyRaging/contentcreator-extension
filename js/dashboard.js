@@ -43,6 +43,7 @@ function setupDashboardPage() {
         $(endCreateBtn).toggleClass('hidden');
         $(createInput).show(150);
         $(inputError).show(150);
+        $(inputField).focus();
     });
     // When the end create button is clicked, toggle its class and that of the create button,
     // hide the input and the input error message, and clear the input error message text
@@ -128,15 +129,25 @@ function setupDashboardPage() {
                             userId: userId
                         },
                         success: function (res) {
-                            inputError.style.color = '#58a75a';
-                            inputError.innerText = 'Submitted';
-                            setTimeout(() => {
-                                inputError.innerText = ``;
-                            }, 5000);
-                            $(inputField).val('');
-                            $(sendCreateBtn).toggleClass('hidden');
-                            $(endCreateBtn).toggleClass('hidden');
-                            tokenData.innerHTML = parseInt(tokenData.innerHTML) - 5;
+                            if (res.error) {
+                                inputError.innerText = res.error;
+                                setTimeout(() => {
+                                    inputError.innerText = ``;
+                                }, 5000);
+                                $(inputField).val('');
+                                $(sendCreateBtn).toggleClass('hidden');
+                                $(endCreateBtn).toggleClass('hidden');
+                            } else if (res.message) {
+                                inputError.style.color = '#58a75a';
+                                inputError.innerText = res.message;
+                                setTimeout(() => {
+                                    inputError.innerText = ``;
+                                }, 5000);
+                                $(inputField).val('');
+                                $(sendCreateBtn).toggleClass('hidden');
+                                $(endCreateBtn).toggleClass('hidden');
+                                tokenData.innerHTML = parseInt(tokenData.innerHTML) - 5;
+                            }
                         },
                         error: function (err) {
                             inputError.innerText = 'Something went wrong';

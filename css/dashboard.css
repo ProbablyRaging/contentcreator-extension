@@ -25,7 +25,7 @@
 .input-error {
     position: absolute;
     left: 10;
-    bottom: 40;
+    bottom: 25;
     font-size: 11px;
     color: #ff7979;
 }
@@ -91,11 +91,6 @@
     height: fit-content;
     margin-right: 6px;
     user-select: none;
-}
-
-.blob:last-of-type {
-    margin-bottom: 6px;
-    cursor: pointer;
 }
 
 @keyframes loading {
