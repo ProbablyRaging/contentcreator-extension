@@ -105,7 +105,7 @@ async function getQueueAndPlay(tabId) {
                 likeVideo(tab);
                 index++;
                 const skipToNext = await getVideoDuration(tab);
-                setTimeout(openTab, 5000);
+                setTimeout(openTab, skipToNext);
             });
         } else {
             // If no more videos are available, navigate to the queue finished page
