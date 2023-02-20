@@ -1,6 +1,7 @@
 
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // Login attempt
     if (message.login) {
         // Create a popup window for Discord authentication
         chrome.windows.create({
@@ -11,60 +12,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             height: 800,
             left: 500
         }, function (window) {
-            let count = 0;
-            // Set up an interval to check if the authentication process is completed
-            const int = setInterval(() => {
-                // If the count reaches 30, the authentication process is considered timed out
-                if (count >= 30) {
-                    // Send a message to the popup indicating that authentication was unsuccessful
-                    try {
-                        chrome.tabs.update(window.tabs[0].id, { url: 'http://localhost/error/noresponse' });
-                    } catch (err) {
-                        console.log('There was a problem : ', err);
-                    }
-                    chrome.runtime.sendMessage({ success: false }).then(() => { if (chrome.runtime.lastError) return; });
-                    return clearInterval(int);
-                }
-                // Check if the Discord authentication tab is still open
-                chrome.tabs.get(window.tabs[0].id, function (tab) {
-                    if (chrome.runtime.lastError) {
-                        // If the tab is closed or not accessible, stop the interval and send a message to the popup indicating that authentication was unsuccessful
-                        chrome.runtime.sendMessage({ success: false }).then(() => { if (chrome.runtime.lastError) return; });
-                        return clearInterval(int);
-                    };
-                    // If the authentication is completed, get the user ID and fetch the user's data
-                    if (tab.url.includes('auth/success?user')) {
-                        const params = new URLSearchParams(tab.url.split('?')[1]);
-                        const userId = params.get('user');
-                        fetch('http://localhost/api/getuser', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ userId: userId })
-                        }).then(response => response.json())
-                            .then(data => {
-                                if (data.result) {
-                                    // Send a message to the popup indicating that authentication was successful and store the user ID
-                                    chrome.runtime.sendMessage({ success: true }).then(() => { if (chrome.runtime.lastError) return; });
-                                    // chrome.windows.remove(window.id);
-                                    chrome.storage.sync.set({ userId: userId });
-                                } else {
-                                    // Send a message to the popup indicating that authentication was unsuccessful
-                                    chrome.runtime.sendMessage({ success: false }).then(() => { if (chrome.runtime.lastError) return; });
-                                }
-                            });
-                        // Stop the interval
-                        clearInterval(int);
-                    } else if (tab.url.includes('error')) {
-                        // If there is an error in the authentication process, stop the interval and send a message to the popup indicating that authentication was unsuccessful
-                        chrome.runtime.sendMessage({ success: false }).then(() => { if (chrome.runtime.lastError) return; });
-                        clearInterval(int);
-                    }
-                });
-                count++;
-            }, 1000);
+            // Check for auth state changes
+            checkAuthState(window);
         });
     }
-
+    // Play queue button
     if (message.queue) {
         // Create a popup window for watching video queues
         chrome.windows.create({
@@ -80,6 +32,47 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
     }
 });
+
+function checkAuthState(window) {
+    chrome.tabs.get(window.tabs[0].id, function (tab) {
+        if (chrome.runtime.lastError) {
+            handleAuthentication(false);
+            return;
+        }
+        if (tab.url.includes('auth/success?user')) {
+            const params = new URLSearchParams(tab.url.split('?')[1]);
+            const userId = params.get('user');
+            fetch('http://localhost/api/getuser', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: userId })
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.result) {
+                        // Send a message to the popup indicating that authentication was successful and store the user ID
+                        handleAuthentication(true);
+                        chrome.storage.sync.set({ userId: userId });
+                    } else {
+                        // Send a message to the popup indicating that authentication was unsuccessful
+                        handleAuthentication(false);
+                    }
+                });
+        } else if (tab.url.includes('error')) {
+            handleAuthentication(false);
+            return;
+        } else {
+            setTimeout(() => {
+                checkAuthState(window);
+            }, 500);
+        }
+    });
+}
+
+function handleAuthentication(success) {
+    chrome.runtime.sendMessage({ success }).then(() => {
+        if (chrome.runtime.lastError) return;
+    });
+}
 
 let monitorCheck;
 async function getQueueAndPlay(tabId) {
