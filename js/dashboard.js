@@ -129,6 +129,7 @@ function setupDashboardPage() {
                             userId: userId
                         },
                         success: function (res) {
+                            console.log(res);
                             if (res.error) {
                                 inputError.innerText = res.error;
                                 setTimeout(() => {
@@ -342,7 +343,7 @@ function setupDashboardPage() {
             characterHTML += `<span class="char${index}" style="--d:${index * 30}ms; --dr:${(characters.length - index - 1) * 30}ms;">${letter}</span>`;
         })
         element.innerHTML = characterHTML;
-    })
+    });
     // Kick off the render loop
     render();
 

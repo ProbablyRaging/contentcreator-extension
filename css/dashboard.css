@@ -74,6 +74,7 @@
     align-items: center;
     line-height: 0;
     gap: 4px;
+    margin: 4px;
 }
 
 .currency img {
@@ -122,6 +123,11 @@ canvas {
     left: 0;
 }
 
+.message .bi {
+    font-size: 24px;
+    color: #3690ff;
+}
+
 button {
     background: none;
     border: none;
@@ -158,11 +164,6 @@ button::before {
 
 button:hover::before {
     filter: brightness(0.9);
-}
-
-.message .bi {
-    font-size: 24px;
-    color: #3690ff;
 }
 
 button.ready .submitMessage svg {
