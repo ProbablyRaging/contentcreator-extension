@@ -2,14 +2,13 @@
     "name": "ForTheContent",
     "manifest_version": 3,
     "version": "1.0.0",
-    "description": "ForTheContent queue watcher",
+    "description": "Easily earn likes and watch time on your YouTube videos",
     "permissions": [
         "storage",
         "tabs"
     ],
     "host_permissions": [
         "https://www.youtube.com/",
-        "https://m.youtube.com/"
     ],
     "background": {
         "service_worker": "js/background.js",
@@ -19,7 +18,6 @@
         {
             "matches": [
                 "https://www.youtube.com/*",
-                "https://m.youtube.com/*"
             ],
             "js": [
                 "js/main.js"
