@@ -84,7 +84,7 @@ function setupDashboardPage() {
     logoutBtn.addEventListener('click', async function () {
         const { userId } = await chrome.storage.sync.get(['userId']);
         $.ajax({
-            url: 'http://localhost/api/logout',
+            url: 'http://54.79.93.12/api/logout',
             type: 'POST',
             data: {
                 userId: userId,
@@ -150,7 +150,7 @@ function setupDashboardPage() {
         // Check the user's tokens
         const { userId } = await chrome.storage.sync.get(['userId']);
         $.ajax({
-            url: 'http://localhost/api/getuser',
+            url: 'http://54.79.93.12/api/getuser',
             type: 'POST',
             data: {
                 userId: userId,
@@ -167,7 +167,7 @@ function setupDashboardPage() {
                 } else {
                     // Get the value of the input field and make post request
                     $.ajax({
-                        url: 'http://localhost/api/submitvideoid',
+                        url: 'http://54.79.93.12/api/submitvideoid',
                         type: 'POST',
                         data: {
                             videoId: inputText,
