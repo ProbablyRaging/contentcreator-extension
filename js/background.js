@@ -85,7 +85,7 @@ let monitorCheck;
 let activeListener;
 let statusChangeCount = 0;
 async function getQueueAndPlay(tabId) {
-    const videoIds = await randomlySelectVideos();
+    const videoIds = await getVideoList();
     // If there are no videos in the list
     if (!videoIds || videoIds.length < 1) {
         try {
@@ -96,12 +96,13 @@ async function getQueueAndPlay(tabId) {
         return;
     }
     let index = 0;
-    function openTab() {
+    function openTab(previousVideoId) {
         // Used to determine if the function should continue, can be flagged
         // by multiple different functions
         if (preventNext) return;
         // Award a token on previous video completion
         if (index > 0) awarkToken(tabId);
+        if (previousVideoId) incrementWatchCount(tabId, previousVideoId);
         // Get the availavble video IDs, navigate to the video watch page and watch
         // the video for 10 minutes before moving on to the next video in the list
         if (index < videoIds.length) {
@@ -122,8 +123,11 @@ async function getQueueAndPlay(tabId) {
                     // Send a message to monitor play state
                     sendTabMessage(tab, { preventPause: true });
                     index++;
+                    // Wait a determined amount of time before skipping to the next video
                     const skipToNext = await getVideoDuration(tab);
-                    setTimeout(openTab, skipToNext);
+                    setTimeout(() => {
+                        openTab(videoIds[index - 1]);
+                    }, 5000);
                 });
             } catch (err) {
                 console.log('There was a problem : ', err);
@@ -238,7 +242,20 @@ function awarkToken(tabId) {
     });
 }
 
-async function randomlySelectVideos() {
+function incrementWatchCount(tabId, videoId) {
+    // Check if the tab is still open
+    chrome.tabs.get(tabId, async function (tab) {
+        if (chrome.runtime.lastError) return;
+        // Send a request to the server to increment the video's watch count
+        fetch('http://localhost/api/addwatch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ videoId: videoId, amount: 1 })
+        });
+    });
+}
+
+async function getVideoList() {
     const response = await fetch('http://localhost/api/videolist', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
@@ -246,17 +263,7 @@ async function randomlySelectVideos() {
     const data = await response.json();
     // Check if the response has a "videoList" property
     if (data.videoList) {
-        const selectedVideos = [];
-        // Select 5 random videos
-        for (let i = 0; i < data.videoList.length; i++) {
-            const randomIndex = Math.floor(Math.random() * data.videoList.length);
-            const randomVideoId = data.videoList[randomIndex];
-            // Check that the video hasn't already been selected
-            if (!selectedVideos.includes(randomVideoId)) {
-                selectedVideos.push(randomVideoId);
-            }
-        }
-        return selectedVideos;
+        return data.videoList;
     } else {
         // Return null if the response has no videoList
         return null;
