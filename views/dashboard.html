@@ -5,7 +5,7 @@
         </div>
 
         <div class="content-container">
-            <p id="containerBody" class="container-body">Begin watching your queue to earn tokens</p>
+            <p id="containerBody" class="container-body">Play your queue to earn tokens</p>
         </div>
 
         <div class="play-button">
@@ -37,21 +37,24 @@
         <div class="footer">
             <p id="input-error" class="input-error"></p>
             <input id="createInput" type="text" placeholder="Enter video ID"></input>
-            <div id="createBtn" class="create" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Submit new video">
+            <div id="logoutBtn" class="footer-btn logout">
+                <i class="bi bi-arrow-return-left"></i>
+            </div>
+            <div id="createBtn" class="footer-btn" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Submit new video">
                 <i class="bi bi-plus-lg"></i>
             </div>
-            <div id="sendCreateBtn" class="create hidden">
+            <div id="sendCreateBtn" class="footer-btn hidden">
                 <i class="bi bi-send-fill"></i>
             </div>
-            <div id="endCreateBtn" class="create hidden">
+            <div id="endCreateBtn" class="footer-btn hidden">
                 <i class="bi bi-x-lg"></i>
             </div>
 
-            <div id="refreshBtn" class="create" data-bs-toggle="tooltip" data-bs-title="Refresh to update token count">
+            <div id="refreshBtn" class="footer-btn" data-bs-toggle="tooltip" data-bs-title="Refresh to update token count">
                 <i class="bi bi-arrow-clockwise"></i>
             </div>
 
-            <div class="currency">
+            <div id="currencyBlob" class="currency">
                 <div class="blob">
                     <p id="tokenData" class="tokens-data">data.result.tokens</p> <img src="../assets/images/tokens.png">
                 </div>

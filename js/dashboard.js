@@ -28,9 +28,20 @@ function setupDashboardPage() {
     const dashboard = document.getElementById('dashboardFadeIn');
     $(dashboard).animate({ opacity: 1 }, 300);
 
+    setTimeout(() => {
+        $('.title-welcome').animate({ opacity: 1 }, 200);
+    }, 470);
+
+    setTimeout(() => {
+        $('.content-container').animate({ opacity: 1 }, 300);
+        $('.play-button').animate({ opacity: 1 }, 300);
+        $('.footer').animate({ opacity: 1 }, 300);
+    }, 770);
+
     const createBtn = document.getElementById('createBtn');
     const endCreateBtn = document.getElementById('endCreateBtn');
     const refreshBtn = document.getElementById('refreshBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
     const createInput = document.getElementById('createInput');
     const inputError = document.getElementById('input-error');
     const inputField = document.getElementById("createInput");
@@ -44,6 +55,8 @@ function setupDashboardPage() {
         $(createInput).show(150);
         $(inputError).show(150);
         $(inputField).focus();
+        $(refreshBtn).hide(150);
+        $(logoutBtn).hide(150);
     });
     // When the end create button is clicked, toggle its class and that of the create button,
     // hide the input and the input error message, and clear the input error message text
@@ -52,12 +65,44 @@ function setupDashboardPage() {
         $(createBtn).toggleClass('hidden');
         $(createInput).hide(150);
         $(inputError).hide(150);
+        $(refreshBtn).show(150);
+        $(logoutBtn).show(150);
         inputError.innerText = '';
     });
     // When the refresh button is clicked, redirect to the loader.html page
     refreshBtn.addEventListener('click', function () {
-        $('body').animate({ opacity: 0 }, 300).promise().then(() => {
-            window.location = '../views/loader.html';
+        $('.title-welcome').animate({ opacity: 0 }, 200);
+        setTimeout(() => {
+            $('.body-bg').animate({ 'background-position-y': '-90px' }, 300);
+            $('body').animate({ opacity: 0 }, 300).promise().then(() => {
+                window.location = '../views/loader.html';
+            });
+        }, 200);
+
+    });
+    // When the logout button is clicked
+    logoutBtn.addEventListener('click', async function () {
+        const { userId } = await chrome.storage.sync.get(['userId']);
+        $.ajax({
+            url: 'http://localhost/api/logout',
+            type: 'POST',
+            data: {
+                userId: userId,
+            },
+            success: function (res) {
+                if (res.message) {
+                    $('.title-welcome').animate({ opacity: 0 }, 200);
+                    setTimeout(() => {
+                        $('.body-bg').animate({ 'background-position-y': '-90px' }, 300);
+                        $('body').animate({ opacity: 0 }, 300).promise().then(() => {
+                            window.location = '../views/loader.html';
+                        });
+                    }, 200);
+                }
+                if (res.error) {
+                    inputError.innerText = res.error;
+                }
+            }
         });
     });
 
@@ -105,7 +150,7 @@ function setupDashboardPage() {
         // Check the user's tokens
         const { userId } = await chrome.storage.sync.get(['userId']);
         $.ajax({
-            url: 'http://54.252.72.200/api/getuser',
+            url: 'http://localhost/api/getuser',
             type: 'POST',
             data: {
                 userId: userId,
@@ -122,7 +167,7 @@ function setupDashboardPage() {
                 } else {
                     // Get the value of the input field and make post request
                     $.ajax({
-                        url: 'http://54.252.72.200/api/submitvideoid',
+                        url: 'http://localhost/api/submitvideoid',
                         type: 'POST',
                         data: {
                             videoId: inputText,
@@ -188,7 +233,7 @@ function setupDashboardPage() {
     const colors = [
         { front: '#FA7268', back: '#398ac7' },
         { front: '#B1356A', back: '#FA7268' },
-        { front: '#C62368', back: '#398ac7' } 
+        { front: '#C62368', back: '#398ac7' }
     ];
     // Helper function to pick a random number within a range
     randomRange = (min, max) => Math.random() * (max - min) + min;

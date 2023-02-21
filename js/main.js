@@ -11,6 +11,10 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
     if (message.blockTab) {
         blockTabInteractions();
     }
+    // Prevent video being paused
+    if (message.preventPause) {
+        preventPausingVideos();
+    }
 });
 
 function findAndClickLikeButton() {
@@ -42,7 +46,7 @@ function getVideoDuration() {
 function blockTabInteractions() {
     let count = 0;
     let staticStyles;
-    const checker = setInterval(() => {
+    const checkBlocker = setInterval(() => {
         let interactionBlocker = document.getElementById('interactionBlocker');
         if (!interactionBlocker) {
             interactionBlocker = document.createElement('interaction-blocker');
@@ -59,7 +63,7 @@ function blockTabInteractions() {
         const checkStyles = document.getElementById('interactionBlocker').getAttribute('style');
         if (count < 1) staticStyles = checkStyles;
         if (staticStyles !== checkStyles) {
-            clearInterval(checker);
+            clearInterval(checkBlocker);
             interactionBlocker.id = 'interactionBlocker';
             interactionBlocker.style.position = 'fixed';
             interactionBlocker.style.top = '0';
@@ -73,4 +77,22 @@ function blockTabInteractions() {
         }
         count++;
     }, 1000);
+}
+
+function preventPausingVideos() {
+    const playButton = document.querySelector('.ytp-play-button');
+    if (playButton) {
+        const checkPlay = setInterval(() => {
+            const buttonState = document.querySelector('.ytp-play-button').getAttribute('data-title-no-tooltip');
+            if (buttonState === 'Play') {
+                console.log('boop');
+                location.reload();
+                clearInterval(checkPlay)
+                return;
+            }
+        }, 1000);
+    } else {
+        // If the play buttons is not found, wait amd try again
+        setTimeout(preventPausingVideos, 1000);
+    }
 }

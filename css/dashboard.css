@@ -8,26 +8,32 @@
 }
 
 .title-welcome {
+    opacity: 0;
     text-align: center;
     font-weight: 800;
     font-size: 16px;
 }
 
 .content-container {
+    opacity: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #00000040;
     border-radius: 10px;
     width: 85%;
     height: fit-content;
     position: absolute;
-    top: 62%;
+    top: 58%;
+    font-weight: 400;
 }
 
 .container-body {
     font-size: 12px;
     line-height: 1px;
+}
+
+.logout {
+    margin-right: auto !important;
 }
 
 .input-error {
@@ -38,7 +44,7 @@
     color: #ff7979;
 }
 
-.create {
+.footer-btn {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -51,26 +57,37 @@
     cursor: pointer;
     min-width: 20px;
     min-height: 20px;
+    transition: background-color 0.2s ease;
 }
 
-.create img {
+.footer-btn:hover {
+    background-color: #0000008b;
+}
+
+.footer-btn img {
     width: 16px;
 }
 
-.create .bi-plus-lg {
+.footer-btn .bi-plus-lg {
     -webkit-text-stroke: 1px;
     color: #26a526;
     font-size: 18px;
 }
 
-.create .bi-send-fill {
+.footer-btn .bi-send-fill {
     -webkit-text-stroke: 1px;
     color: #5892e3;
     font-size: 16px;
 }
 
-.create .bi-x-lg {
+.footer-btn .bi-x-lg {
     -webkit-text-stroke: 1px;
+    color: #d94848;
+    font-size: 16px;
+}
+
+.footer-btn .bi-arrow-return-left {
+    -webkit-text-stroke: 0.5px;
     color: #d94848;
     font-size: 16px;
 }
@@ -103,6 +120,7 @@
 }
 
 .footer {
+    opacity: 0;
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -160,6 +178,10 @@ canvas {
     color: #3690ff;
 }
 
+.play-button {
+    opacity: 0;
+}
+
 button {
     background: none;
     border: none;
@@ -181,7 +203,7 @@ button {
 }
 
 button::before {
-    background: #2b2e44;
+    background: #1a2f4edb;
     border-radius: 50px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4) inset;
     content: '';
@@ -195,7 +217,7 @@ button::before {
 }
 
 button:hover::before {
-    filter: brightness(0.9);
+    filter: brightness(1.2);
 }
 
 button.ready .submitMessage svg {

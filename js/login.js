@@ -18,6 +18,10 @@ function checkLoginPage() {
 }
 
 function setupLoginPage() {
+    setTimeout(() => {
+        $('.content').animate({ opacity: 1 }, 300);
+    }, 570);
+
     const authButton = document.getElementById('discordAuth');
     authButton.addEventListener('click', function () {
         chrome.runtime.sendMessage({ login: true }, () => { if (chrome.runtime.lastError) return; });
@@ -28,10 +32,13 @@ function setupLoginPage() {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (message.success) {
             const body = document.body;
-            $(body).animate({ opacity: 0 }, 300).promise().then(() => {
-                window.location = '../views/loader.html';
-                $(body).animate({ opacity: 1 }, 300);
-            });
+            $('.body-bg').animate({ 'background-position-y': '-90px' }, 300);
+            setTimeout(() => {
+                $(body).animate({ opacity: 0 }, 300).promise().then(() => {
+                    window.location = '../views/loader.html';
+                    $(body).animate({ opacity: 1 }, 300);
+                });
+            }, 300);
         } else {
             authButton.innerHTML = 'Login via Discord';
             authButton.disabled = false;

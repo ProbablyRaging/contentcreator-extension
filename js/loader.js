@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check if user has an active session
     const { userId } = await chrome.storage.sync.get(['userId']);
     setTimeout(async () => {
-        const response = await fetch('http://54.252.72.200/api/getuser', {
+        const response = await fetch('http://localhost/api/getuser', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: userId })
@@ -40,6 +40,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         $('page-content').attr('page', 'login');
                     }
                     $(body).animate({ opacity: 1 }, 300);
+                    $(body).addClass('body-bg');
+                    $('.body-bg').animate({ 'background-position-y': '-14px' }, 300);
                 }
             });
         });
