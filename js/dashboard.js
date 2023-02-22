@@ -67,6 +67,7 @@ async function setupDashboardPage() {
     const endCreateBtn = document.getElementById('endCreateBtn');
     const refreshBtn = document.getElementById('refreshBtn');
     const logoutBtn = document.getElementById('logoutBtn');
+    const statsBtn = document.getElementById('statsBtn');
     const createInput = document.getElementById('createInput');
     const inputError = document.getElementById('input-error');
     const inputField = document.getElementById("createInput");
@@ -88,6 +89,7 @@ async function setupDashboardPage() {
         $(inputField).focus();
         $(refreshBtn).hide(150);
         $(logoutBtn).hide(150);
+        $(statsBtn).hide(150);
     });
     // When the end create button is clicked, toggle its class and that of the create button,
     // hide the input and the input error message, and clear the input error message text
@@ -98,6 +100,7 @@ async function setupDashboardPage() {
         $(inputError).hide(150);
         $(refreshBtn).show(150);
         $(logoutBtn).show(150);
+        $(statsBtn).show(150);
         inputError.innerText = '';
     });
     // When the refresh button is clicked, redirect to the loader.html page
@@ -107,6 +110,17 @@ async function setupDashboardPage() {
             $('.body-bg').animate({ 'background-position-y': '-90px' }, 300);
             $('body').animate({ opacity: 0 }, 300).promise().then(() => {
                 window.location = '../views/loader.html';
+            });
+        }, 200);
+    });
+    // When the refresh button is clicked, redirect to the loader.html page
+    statsBtn.addEventListener('click', function () {
+        $('.title-welcome').animate({ opacity: 0 }, 200);
+        setTimeout(() => {
+            $('.body-bg').animate({ 'background-position-y': '-90px' }, 300);
+            $('body').animate({ opacity: 0 }, 300).promise().then(() => {
+                const someData = 'statistics';
+                window.location = '../views/loader.html?data=' + encodeURIComponent(someData);
             });
         }, 200);
 

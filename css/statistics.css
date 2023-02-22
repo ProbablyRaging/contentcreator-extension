@@ -1,0 +1,9 @@
+.return {
+    margin-right: auto !important;
+}
+
+.footer .bi-arrow-left {
+    -webkit-text-stroke: 1px;
+    color: #bbbbbb;
+    font-size: 18px;
+}

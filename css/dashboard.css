@@ -106,6 +106,12 @@
     font-size: 16px;
 }
 
+.footer-btn .bi-bar-chart {
+    -webkit-text-stroke: 0.5px;
+    color: #4893d9;
+    font-size: 16px;
+}
+
 .currency {
     display: flex;
     flex-direction: column;
