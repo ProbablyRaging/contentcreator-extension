@@ -13,8 +13,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const data = await response.json();
         const body = document.body;
 
-        console.log(data);
-
         if (!params && data.result && new Date().valueOf() < data.result.expires) {
             cssToRemove = 'link[href="../css/login.css"]';
             viewPage = '../views/dashboard.html';
