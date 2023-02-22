@@ -1,11 +1,13 @@
-
+chrome.runtime.onInstalled.addListener((details) => {
+    if (details.reason === 'update') chrome.storage.sync.set({ activeQueue: false });
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Login attempt
     if (message.login) {
         // Create a popup window for Discord authentication
         chrome.windows.create({
-            url: 'https://discord.com/api/oauth2/authorize?client_id=977292001718464592&redirect_uri=http://54.79.93.12/auth/redirect&response_type=code&scope=guilds%20identify',
+            url: 'https://discord.com/api/oauth2/authorize?client_id=977292001718464592&redirect_uri=http://localhost/auth/redirect&response_type=code&scope=guilds%20identify',
             focused: true,
             type: 'popup',
             width: 600,
@@ -101,7 +103,7 @@ async function getQueueAndPlay(tabId) {
         // by multiple different functions
         if (preventNext) return;
         // Award a token on previous video completion
-        if (index > 0) awarkToken(tabId);
+        if (index > 0) awardToken(tabId);
         if (previousVideoId) incrementWatchCount(tabId, previousVideoId);
         // Get the availavble video IDs, navigate to the video watch page and watch
         // the video for 10 minutes before moving on to the next video in the list
@@ -227,7 +229,7 @@ async function getVideoDuration(tab) {
     });
 }
 
-function awarkToken(tabId) {
+function awardToken(tabId) {
     // Check if the tab is still open
     chrome.tabs.get(tabId, async function (tab) {
         if (chrome.runtime.lastError) return;

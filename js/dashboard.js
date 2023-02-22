@@ -24,7 +24,9 @@ function checkDashboardPage() {
     reCheck();
 }
 
-function setupDashboardPage() {
+async function setupDashboardPage() {
+    const { activeQueue } = await chrome.storage.sync.get(['activeQueue']);
+
     const dashboard = document.getElementById('dashboardFadeIn');
     $(dashboard).animate({ opacity: 1 }, 300);
 
@@ -38,6 +40,7 @@ function setupDashboardPage() {
         $('.footer').animate({ opacity: 1 }, 300);
     }, 770);
 
+    const button = document.getElementById('button');
     const createBtn = document.getElementById('createBtn');
     const endCreateBtn = document.getElementById('endCreateBtn');
     const refreshBtn = document.getElementById('refreshBtn');
@@ -47,6 +50,12 @@ function setupDashboardPage() {
     const inputField = document.getElementById("createInput");
     const sendCreateBtn = document.getElementById('sendCreateBtn');
     const tokenData = document.getElementById('tokenData');
+
+    if (activeQueue) {
+        button.disabled = true;
+        button.classList.add('complete');
+        button.classList.remove('ready');
+    }
     // When the create button is clicked, toggle its class and that
     // of the end create button, show the input and the input error message
     createBtn.addEventListener('click', function () {
@@ -84,7 +93,7 @@ function setupDashboardPage() {
     logoutBtn.addEventListener('click', async function () {
         const { userId } = await chrome.storage.sync.get(['userId']);
         $.ajax({
-            url: 'http://54.79.93.12/api/logout',
+            url: 'http://localhost/api/logout',
             type: 'POST',
             data: {
                 userId: userId,
@@ -150,7 +159,7 @@ function setupDashboardPage() {
         // Check the user's tokens
         const { userId } = await chrome.storage.sync.get(['userId']);
         $.ajax({
-            url: 'http://54.79.93.12/api/getuser',
+            url: 'http://localhost/api/getuser',
             type: 'POST',
             data: {
                 userId: userId,
@@ -167,7 +176,7 @@ function setupDashboardPage() {
                 } else {
                     // Get the value of the input field and make post request
                     $.ajax({
-                        url: 'http://54.79.93.12/api/submitvideoid',
+                        url: 'http://localhost/api/submitvideoid',
                         type: 'POST',
                         data: {
                             videoId: inputText,
@@ -209,7 +218,6 @@ function setupDashboardPage() {
         });
     });
 
-    const button = document.getElementById('button');
     var disabled = false;
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');

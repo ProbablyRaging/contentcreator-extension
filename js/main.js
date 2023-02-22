@@ -15,6 +15,10 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
     if (message.preventPause) {
         preventPausingVideos();
     }
+    // Check if user is signed in
+    if (message.checkSignin) {
+        sendResponse(await checkSigninState());
+    }
 });
 
 function findAndClickLikeButton() {
@@ -80,19 +84,40 @@ function blockTabInteractions() {
 }
 
 function preventPausingVideos() {
-    const playButton = document.querySelector('.ytp-play-button');
-    if (playButton) {
-        const checkPlay = setInterval(() => {
-            const buttonState = document.querySelector('.ytp-play-button').getAttribute('data-title-no-tooltip');
-            if (buttonState === 'Play') {
-                console.log('boop');
-                location.reload();
-                clearInterval(checkPlay)
-                return;
+    // const playButton = document.querySelector('.ytp-play-button');
+    // if (playButton) {
+    // let checkPlay;
+    //     checkPlay = setInterval(() => {
+    //         const buttonState = document.querySelector('.ytp-play-button').getAttribute('data-title-no-tooltip');
+    //         if (buttonState === 'Play') {
+    //             location.reload();
+    //             clearInterval(checkPlay)
+    //             return;
+    //         }
+    //     }, 1000);
+    // } else {
+    //     // If the play buttons is not found, wait amd try again
+    //     setTimeout(preventPausingVideos, 1000);
+    // }
+}
+
+async function checkSigninState() {
+    return new Promise((resolve) => {
+        const TIMEOUT = 5000; // Timeout after 5 seconds
+        let timeoutId;
+        const checkSignin = setInterval(() => {
+            const modal = document.querySelector('div.style-scope.ytd-modal-with-title-and-button-renderer');
+            if (modal) {
+                clearInterval(checkSignin);
+                clearTimeout(timeoutId);
+                const isSignedIn = !modal.innerText.includes('Sign in');
+                resolve(isSignedIn);
             }
         }, 1000);
-    } else {
-        // If the play buttons is not found, wait amd try again
-        setTimeout(preventPausingVideos, 1000);
-    }
+
+        timeoutId = setTimeout(() => {
+            clearInterval(checkSignin);
+            resolve(false);
+        }, TIMEOUT);
+    });
 }
