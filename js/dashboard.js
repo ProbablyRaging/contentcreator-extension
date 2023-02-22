@@ -24,6 +24,16 @@ function checkDashboardPage() {
     reCheck();
 }
 
+function numberWithCommas(x) {
+    if (x >= 1000000) {
+        return (x / 1000000).toFixed(1) + 'M';
+    } else if (x >= 1000) {
+        return (x / 1000).toFixed(1) + 'K';
+    } else {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+}
+
 async function setupDashboardPage() {
     const { activeQueue } = await chrome.storage.sync.get(['activeQueue']);
 
@@ -47,19 +57,21 @@ async function setupDashboardPage() {
         success: function (res) {
             setTimeout(() => {
                 const watchCount = document.getElementById('watchCount');
-                watchCount.innerHTML = `<p class="wc-number count-up">${res.watchCount}</p> ${watchCount.innerText}`;
-                const watchCounter = $('.count-up');
-                watchCounter.prop('Counter', 0).animate({
-                    Counter: watchCounter.text()
-                }, {
-                    duration: 2000,
-                    easing: 'swing',
-                    step: function (now) {
-                        // Round up the value and set it as the text of the element
-                        watchCounter.text(Math.ceil(now));
+                watchCount.innerHTML = `<p class="wc-number count-up">0</p> ${watchCount.innerText}`;
+                $({ countNum: 0 }).animate(
+                    { countNum: res.watchCount },
+                    {
+                        duration: 1000,
+                        easing: 'linear',
+                        step: function () {
+                            watchCount.querySelector('.count-up').innerText = numberWithCommas(this.countNum.toFixed(0));
+                        },
+                        complete: function () {
+                            watchCount.querySelector('.count-up').innerText = numberWithCommas(res.watchCount);
+                        }
                     }
-                });
-            }, 300);
+                );
+            }, 600);
         }
     });
 

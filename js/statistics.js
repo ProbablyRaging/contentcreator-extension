@@ -17,35 +17,49 @@ function checkStatsPage() {
     reCheck();
 }
 
+function numberWithCommas(x) {
+    if (x >= 1000000) {
+        return (x / 1000000).toFixed(1) + 'M';
+    } else if (x >= 1000) {
+        return (x / 1000).toFixed(1) + 'K';
+    } else {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+}
+
 function setupStatsPage() {
     const dashboard = document.getElementById('dashboardFadeIn');
     $(dashboard).animate({ opacity: 1 }, 300);
-
-        $('.stats-number').each(function () {
-            var $this = $(this);
-            // Get the target value from the text of the element and set to 0
-            var targetValue = parseInt($this.text());
-            $this.text('0');
-            // Animate the value from 0 to the target value
-            $({ countNum: 0 }).animate({ countNum: targetValue }, {
-                duration: 2000,
-                easing: 'linear',
-                step: function () {
-                    // Round up the value and set it as the text of the element
-                    $this.text(Math.ceil(this.countNum));
-                }
-            });
-        });
 
     setTimeout(() => {
         $('.title-welcome').animate({ opacity: 1 }, 200);
     }, 470);
 
     setTimeout(() => {
-        $('.content-container').animate({ opacity: 1 }, 300);
-        $('.play-button').animate({ opacity: 1 }, 300);
+        $('.stats-box').animate({ opacity: 1 }, 300);
         $('.footer').animate({ opacity: 1 }, 300);
     }, 770);
+
+    setTimeout(() => {
+        $('.stats-number').each(function () {
+            const $this = $(this);
+            const targetValue = parseInt($this.text());
+            $this.text('0');
+            $({ countNum: 0 }).animate(
+                { countNum: targetValue },
+                {
+                    duration: 1000,
+                    easing: 'linear',
+                    step: function () {
+                        $this.text(numberWithCommas(this.countNum.toFixed(0)));
+                    },
+                    complete: function () {
+                        $this.text(numberWithCommas(targetValue));
+                    },
+                }
+            );
+        });
+    }, 600);
 
     const returnBtn = document.getElementById('returnBtn');
 

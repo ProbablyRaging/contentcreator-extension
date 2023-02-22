@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         newBody = newBody.replace('data.result.tokens', data.result.tokens || 0);
                         newBody = newBody.replace('data.result.submissions', data.result.submissions || 0);
                         newBody = newBody.replaceAll('data.result.views', data.result.views || 0);
+                        newBody = newBody.replace('data.result.watches', data.result.watches || 0);
                         $('page-content').html(newBody);
                         $('page-content').attr('page', 'statistics');
                     }

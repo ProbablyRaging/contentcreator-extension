@@ -148,7 +148,7 @@ async function getQueueAndPlay(tabId) {
                     const skipToNext = await getVideoDuration(tab);
                     setTimeout(() => {
                         openTab(videoIds[index - 1]);
-                    }, skipToNext);
+                    }, 5000);
                 });
             } catch (err) {
                 console.log('There was a problem : ', err);
@@ -270,11 +270,13 @@ function incrementWatchCount(tabId, videoId) {
     // Check if the tab is still open
     chrome.tabs.get(tabId, async function (tab) {
         if (chrome.runtime.lastError) return;
+        // Retrieve the user ID from storage
+        const { userId } = await chrome.storage.sync.get(['userId']);
         // Send a request to the server to increment the video's watch count
         fetch('http://54.79.93.12/api/addwatch', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ videoId: videoId, amount: 1 })
+            body: JSON.stringify({ videoId: videoId, amount: 1, userId: userId })
         });
     });
 }
