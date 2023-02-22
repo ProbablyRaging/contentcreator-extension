@@ -2,7 +2,7 @@ chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === 'update') chrome.storage.sync.set({ activeQueue: false });
 });
 
-let initWindow;
+let initWindowId;
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Login attempt
     if (message.login) {
@@ -29,14 +29,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             width: 600,
             height: 800,
         }, function (window) {
-            initWindow = window.id;
+            initWindowId = window.id;
             // Stop executing if the window is closed
             if (chrome.runtime.lastError) return;
             // Mute the tab
             try {
                 setTimeout(() => {
                     chrome.tabs.update(window.tabs[0].id, { muted: true });
-                }, 2000);
+                }, 3000);
             } catch (err) {
                 console.log('There was a problem : ', err);
             }
@@ -45,7 +45,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     if (message.signedIn === false) {
-        chrome.windows.remove(initWindow);
+        if (initWindowId) chrome.windows.remove(initWindowId);
         chrome.windows.create({
             url: 'http:54.79.93.12/error/notsignedin',
             focused: true,
@@ -139,7 +139,7 @@ async function getQueueAndPlay(tabId) {
                     sendTabMessage(tab, { blockTab: true });
                     // Send a message to monitor play state
                     sendTabMessage(tab, { preventPause: true });
-
+                    // Send a message to check if the user is signed in
                     sendTabMessage(tab, { checkSignin: true });
                     index++;
                     // Wait a determined amount of time before skipping to the next video

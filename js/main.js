@@ -83,28 +83,33 @@ function blockTabInteractions() {
     }, 1000);
 }
 
+let playStateInt;
 function preventPausingVideos() {
-    const playButton = document.querySelector('.ytp-play-button');
-    if (playButton) {
-        // let checkPlay;
-        setInterval(() => {
-            const buttonState = document.querySelector('.ytp-play-button').getAttribute('data-title-no-tooltip');
-            if (buttonState === 'Play') {
-                playButton.click();
-                // clearInterval(checkPlay)
-                return;
-            }
-        }, 1000);
-    } else {
-        // If the play buttons is not found, wait amd try again
-        setTimeout(preventPausingVideos, 1000);
+    if (!playStateInt) {
+        const playButton = document.querySelector('.ytp-play-button');
+        if (playButton) {
+            // let checkPlay;
+            playStateInt = setInterval(() => {
+                const buttonState = document.querySelector('.ytp-play-button').getAttribute('data-title-no-tooltip');
+                if (buttonState === 'Play') {
+                    playButton.click();
+                }
+            }, 1000);
+        } else {
+            // If the play buttons is not found, wait amd try again
+            setTimeout(preventPausingVideos, 1000);
+        }
     }
 }
 
 function checkIfSignedIn() {
     const signInModal = document.querySelector('.style-scope.ytd-modal-with-title-and-button-renderer');
     if (signInModal) {
-        chrome.runtime.sendMessage({ signedIn: false });
+        try {
+            chrome.runtime.sendMessage({ signedIn: false });
+        } catch (err) {
+            console.log('There was a problem : ', err);
+        }
     } else {
         // If the like button is not found, wait amd try again
         setTimeout(checkIfSignedIn, 1000);
