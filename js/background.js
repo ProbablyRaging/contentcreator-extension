@@ -168,8 +168,6 @@ async function getQueueAndPlay(tabId) {
     openTab();
 }
 
-let intervalIds = [];
-
 // Sets up monitoring of the specified tab
 function initMonitoring(tab, url) {
     chrome.storage.sync.set({ activeQueue: true });
