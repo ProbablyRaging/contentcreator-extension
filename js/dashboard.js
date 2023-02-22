@@ -170,7 +170,7 @@ async function setupDashboardPage() {
         const inputText = inputField.value;
         // Only allow video IDs
         function checkId(input) {
-            const regex = /(https:|http:|www\.|\.com\/|\/watch=|youtu\.be\/)/i;
+            const regex = /(https:|http:|www\.|\.com\/|\/watch=|youtu\.be\/|&t=)/i;
             if (regex.exec(input)) {
                 return false
             } else {
