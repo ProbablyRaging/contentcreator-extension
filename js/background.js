@@ -2,12 +2,13 @@ chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === 'update') chrome.storage.sync.set({ activeQueue: false });
 });
 
+let initWindow;
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Login attempt
     if (message.login) {
         // Create a popup window for Discord authentication
         chrome.windows.create({
-            url: 'https://discord.com/api/oauth2/authorize?client_id=977292001718464592&redirect_uri=http://localhost/auth/redirect&response_type=code&scope=guilds%20identify',
+            url: 'https://discord.com/api/oauth2/authorize?client_id=977292001718464592&redirect_uri=http://54.79.93.12/auth/redirect&response_type=code&scope=guilds%20identify',
             focused: true,
             type: 'popup',
             width: 600,
@@ -28,15 +29,29 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             width: 600,
             height: 800,
         }, function (window) {
+            initWindow = window.id;
             // Stop executing if the window is closed
             if (chrome.runtime.lastError) return;
             // Mute the tab
             try {
-                chrome.tabs.update(window.tabs[0].id, { muted: true });
+                setTimeout(() => {
+                    chrome.tabs.update(window.tabs[0].id, { muted: true });
+                }, 2000);
             } catch (err) {
                 console.log('There was a problem : ', err);
             }
             getQueueAndPlay(window.tabs[0].id);
+        });
+    }
+
+    if (message.signedIn === false) {
+        chrome.windows.remove(initWindow);
+        chrome.windows.create({
+            url: 'http:54.79.93.12/error/notsignedin',
+            focused: true,
+            type: 'panel',
+            width: 600,
+            height: 800
         });
     }
 });
@@ -124,6 +139,8 @@ async function getQueueAndPlay(tabId) {
                     sendTabMessage(tab, { blockTab: true });
                     // Send a message to monitor play state
                     sendTabMessage(tab, { preventPause: true });
+
+                    sendTabMessage(tab, { checkSignin: true });
                     index++;
                     // Wait a determined amount of time before skipping to the next video
                     const skipToNext = await getVideoDuration(tab);
@@ -151,11 +168,13 @@ let intervalIds = [];
 
 // Sets up monitoring of the specified tab
 function initMonitoring(tab, url) {
+    chrome.storage.sync.set({ activeQueue: true });
     // Check the status of the tab every second
     monitorCheck = setInterval(() => {
         // If the user closes the tab early, stop monitoring
         chrome.tabs.get(tab.id, function (tab) {
             if (chrome.runtime.lastError) {
+                chrome.storage.sync.set({ activeQueue: false });
                 clearInterval(monitorCheck);
                 return;
             }
@@ -180,8 +199,8 @@ function listenForTabUpdates(tab) {
             if (changeInfo.status === 'loading' && (!changeInfo.url || !changeInfo.url.includes('success'))) statusChangeCount++
             if (statusChangeCount > 1) {
                 try {
-                    console.log('beep');
                     preventNext = true;
+                    chrome.storage.sync.set({ activeQueue: false });
                     chrome.tabs.onUpdated.removeListener(listenerFunc);
                     chrome.tabs.update(tabId, { url: `http://54.79.93.12/error/inputdetected` });
                 } catch (err) {
