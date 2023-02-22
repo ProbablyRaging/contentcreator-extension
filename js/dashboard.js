@@ -40,6 +40,28 @@ async function setupDashboardPage() {
         $('.footer').animate({ opacity: 1 }, 300);
     }, 770);
 
+    // Set the video counter
+    $.ajax({
+        url: 'http://54.79.93.12/api/videolist',
+        type: 'GET',
+        success: function (res) {
+            setTimeout(() => {
+                const watchCount = document.getElementById('watchCount');
+                watchCount.innerHTML = `<p class="wc-number count-up">${res.watchCount}</p> ${watchCount.innerText}`;
+                const watchCounter = $('.count-up');
+                watchCounter.prop('Counter', 0).animate({
+                    Counter: watchCounter.text()
+                }, {
+                    duration: 2000, // Change the duration to control the speed of the animation
+                    easing: 'swing',
+                    step: function (now) {
+                        watchCounter.text(Math.ceil(now));
+                    }
+                });
+            }, 300);
+        }
+    });
+
     const button = document.getElementById('button');
     const createBtn = document.getElementById('createBtn');
     const endCreateBtn = document.getElementById('endCreateBtn');
@@ -93,7 +115,7 @@ async function setupDashboardPage() {
     logoutBtn.addEventListener('click', async function () {
         const { userId } = await chrome.storage.sync.get(['userId']);
         $.ajax({
-            url: 'http://localhost/api/logout',
+            url: 'http://54.79.93.12/api/logout',
             type: 'POST',
             data: {
                 userId: userId,
@@ -159,7 +181,7 @@ async function setupDashboardPage() {
         // Check the user's tokens
         const { userId } = await chrome.storage.sync.get(['userId']);
         $.ajax({
-            url: 'http://localhost/api/getuser',
+            url: 'http://54.79.93.12/api/getuser',
             type: 'POST',
             data: {
                 userId: userId,
@@ -176,7 +198,7 @@ async function setupDashboardPage() {
                 } else {
                     // Get the value of the input field and make post request
                     $.ajax({
-                        url: 'http://localhost/api/submitvideoid',
+                        url: 'http://54.79.93.12/api/submitvideoid',
                         type: 'POST',
                         data: {
                             videoId: inputText,

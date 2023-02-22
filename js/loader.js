@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check if user has an active session
     const { userId } = await chrome.storage.sync.get(['userId']);
     setTimeout(async () => {
-        const response = await fetch('http://localhost/api/getuser', {
+        const response = await fetch('http://54.79.93.12/api/getuser', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: userId })

@@ -8,7 +8,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.login) {
         // Create a popup window for Discord authentication
         chrome.windows.create({
-            url: 'https://discord.com/api/oauth2/authorize?client_id=977292001718464592&redirect_uri=http://localhost/auth/redirect&response_type=code&scope=guilds%20identify',
+            url: 'https://discord.com/api/oauth2/authorize?client_id=977292001718464592&redirect_uri=http://54.79.93.12/auth/redirect&response_type=code&scope=guilds%20identify',
             focused: true,
             type: 'popup',
             width: 600,
@@ -48,7 +48,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (initWindowId) chrome.windows.remove(initWindowId);
         const errorMessage = 'You must sign in to YouTube to use this app'
         chrome.windows.create({
-            url: `http://localhost/error?message=${errorMessage}`,
+            url: `http://54.79.93.12/error?message=${errorMessage}`,
             focused: true,
             type: 'panel',
             width: 600,
@@ -66,7 +66,7 @@ function checkAuthState(window) {
         if (tab.url.includes('auth/success?user')) {
             const params = new URLSearchParams(tab.url.split('?')[1]);
             const userId = params.get('user');
-            fetch('http://localhost/api/getuser', {
+            fetch('http://54.79.93.12/api/getuser', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: userId })
@@ -108,7 +108,7 @@ async function getQueueAndPlay(tabId) {
     if (!videoIds || videoIds.length < 1) {
         try {
             const errorMessage = 'There are currently no videos in the queue';
-            chrome.tabs.update(tabId, { url: `http://localhost/error?message=${errorMessage}` });
+            chrome.tabs.update(tabId, { url: `http://54.79.93.12/error?message=${errorMessage}` });
         } catch (err) {
             console.log('There was a problem : ', err);
         }
@@ -155,10 +155,11 @@ async function getQueueAndPlay(tabId) {
             }
         } else {
             // If no more videos are available, navigate to the queue finished page
-            clearInterval(monitorCheck);
             try {
+                chrome.storage.sync.set({ activeQueue: false });
+                clearInterval(monitorCheck);
                 const successMessage = 'You have reached the end of the queue';
-                chrome.tabs.update(tabId, { url: `http://localhost/success?message=${successMessage}` });
+                chrome.tabs.update(tabId, { url: `http://54.79.93.12/success?message=${successMessage}` });
             } catch (err) {
                 console.log('There was a problem : ', err);
             }
@@ -206,7 +207,7 @@ function listenForTabUpdates(tab) {
                     chrome.storage.sync.set({ activeQueue: false });
                     chrome.tabs.onUpdated.removeListener(listenerFunc);
                     const errorMessage = 'Block user input was detected. Please do not try to interact with tabs in the queue window'
-                    chrome.tabs.update(tabId, { url: `http://localhost/error?message=${errorMessage}` });
+                    chrome.tabs.update(tabId, { url: `http://54.79.93.12/error?message=${errorMessage}` });
                 } catch (err) {
                     console.log('There was a problem : ', err);
                 }
@@ -259,7 +260,7 @@ function awardToken(tabId) {
         // Retrieve the user ID from storage
         const { userId } = await chrome.storage.sync.get(['userId']);
         // Send a request to the server to add a token to the user's account
-        fetch('http://localhost/api/addtokens', {
+        fetch('http://54.79.93.12/api/addtokens', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: userId, amount: 1 })
@@ -272,7 +273,7 @@ function incrementWatchCount(tabId, videoId) {
     chrome.tabs.get(tabId, async function (tab) {
         if (chrome.runtime.lastError) return;
         // Send a request to the server to increment the video's watch count
-        fetch('http://localhost/api/addwatch', {
+        fetch('http://54.79.93.12/api/addwatch', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ videoId: videoId, amount: 1 })
@@ -281,7 +282,7 @@ function incrementWatchCount(tabId, videoId) {
 }
 
 async function getVideoList() {
-    const response = await fetch('http://localhost/api/videolist', {
+    const response = await fetch('http://54.79.93.12/api/videolist', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
     });

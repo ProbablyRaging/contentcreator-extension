@@ -19,17 +19,31 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     border-radius: 10px;
     width: 85%;
     height: fit-content;
     position: absolute;
-    top: 58%;
+    top: 48%;
     font-weight: 400;
 }
 
 .container-body {
     font-size: 12px;
     line-height: 1px;
+}
+
+.container-body-lg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    line-height: 1px;
+}
+
+.wc-number {
+    font-size: 20px;
+    color: #62a1e3;
 }
 
 .logout {
@@ -192,11 +206,11 @@ button {
     font-weight: 500;
     height: 40px;
     left: 50%;
+    top: 42%;
     outline: none;
     overflow: hidden;
     padding: 0 10px;
     position: fixed;
-    top: 50%;
     transform: translate(-50%, -50%);
     width: 190px;
     z-index: 1;
