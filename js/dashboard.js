@@ -52,9 +52,10 @@ async function setupDashboardPage() {
                 watchCounter.prop('Counter', 0).animate({
                     Counter: watchCounter.text()
                 }, {
-                    duration: 2000, // Change the duration to control the speed of the animation
+                    duration: 2000,
                     easing: 'swing',
                     step: function (now) {
+                        // Round up the value and set it as the text of the element
                         watchCounter.text(Math.ceil(now));
                     }
                 });

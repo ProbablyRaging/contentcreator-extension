@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const data = await response.json();
         const body = document.body;
 
+        console.log(data);
+
         if (!params && data.result && new Date().valueOf() < data.result.expires) {
             cssToRemove = 'link[href="../css/login.css"]';
             viewPage = '../views/dashboard.html';
@@ -47,6 +49,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (viewPage.includes('statistics')) {
                         newBody = newBody.replace('data.result.title', `${data.result.username}'s Stats`);
                         newBody = newBody.replace('data.result.tokens', data.result.tokens || 0);
+                        newBody = newBody.replace('data.result.submissions', data.result.submissions || 0);
+                        newBody = newBody.replaceAll('data.result.views', data.result.views || 0);
                         $('page-content').html(newBody);
                         $('page-content').attr('page', 'statistics');
                     }

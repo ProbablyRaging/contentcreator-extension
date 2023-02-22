@@ -21,6 +21,22 @@ function setupStatsPage() {
     const dashboard = document.getElementById('dashboardFadeIn');
     $(dashboard).animate({ opacity: 1 }, 300);
 
+        $('.stats-number').each(function () {
+            var $this = $(this);
+            // Get the target value from the text of the element and set to 0
+            var targetValue = parseInt($this.text());
+            $this.text('0');
+            // Animate the value from 0 to the target value
+            $({ countNum: 0 }).animate({ countNum: targetValue }, {
+                duration: 2000,
+                easing: 'linear',
+                step: function () {
+                    // Round up the value and set it as the text of the element
+                    $this.text(Math.ceil(this.countNum));
+                }
+            });
+        });
+
     setTimeout(() => {
         $('.title-welcome').animate({ opacity: 1 }, 200);
     }, 470);
