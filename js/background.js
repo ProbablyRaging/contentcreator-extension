@@ -148,7 +148,7 @@ async function getQueueAndPlay(tabId) {
                     const skipToNext = await getVideoDuration(tab);
                     setTimeout(() => {
                         openTab(videoIds[index - 1]);
-                    }, 5000);
+                    }, skipToNext);
                 });
             } catch (err) {
                 console.log('There was a problem : ', err);
