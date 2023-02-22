@@ -47,7 +47,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         $('page-content').attr('page', 'dashboard');
                     }
                     if (viewPage.includes('statistics')) {
-                        newBody = newBody.replace('data.result.title', `${data.result.username}'s Stats`);
                         newBody = newBody.replace('data.result.tokens', data.result.tokens || 0);
                         newBody = newBody.replace('data.result.submissions', data.result.submissions || 0);
                         newBody = newBody.replaceAll('data.result.views', data.result.views || 0);
