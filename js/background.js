@@ -204,12 +204,12 @@ function listenForTabUpdates(tab) {
     function listenerFunc(tabId, changeInfo, thisTab) {
         if (tabId === tab.id) {
             if (changeInfo.status === 'loading' && (!changeInfo.url || !changeInfo.url.includes('success'))) statusChangeCount++
-            if (statusChangeCount > 1) {
+            if (statusChangeCount > 2) {
                 try {
                     preventNext = true;
                     chrome.storage.sync.set({ activeQueue: false });
                     chrome.tabs.onUpdated.removeListener(listenerFunc);
-                    const errorMessage = 'Block user input was detected. Please do not try to interact with tabs in the queue window'
+                    const errorMessage = 'Blocked user input was detected. Please do not try to interact with tabs in the queue window'
                     chrome.tabs.update(tabId, { url: `http://54.79.93.12/error?message=${errorMessage}` });
                 } catch (err) {
                     console.log('There was a problem : ', err);
