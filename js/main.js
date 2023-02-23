@@ -32,7 +32,13 @@ function findAndClickLikeButton(tabId, videoId) {
     }
 }
 
+let retries = 0;
 function getVideoDuration() {
+    // Fallback if we can't find a duration
+    if (retries >= 3) {
+        retries = 0;
+        return 600000;
+    };
     const durationStr = document.querySelector('.ytp-time-duration').innerHTML;
     if (durationStr) {
         const [minutesStr, secondsStr] = durationStr.split(':');
@@ -44,6 +50,7 @@ function getVideoDuration() {
         return returnedDuration;
     } else {
         // If the duration string is not found, wait amd try again
+        retries++
         setTimeout(getVideoDuration, 1000);
     }
 }

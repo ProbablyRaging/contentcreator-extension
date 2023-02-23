@@ -331,37 +331,42 @@ async function setupDashboardPage() {
         });
     });
 
-    // Get the current local time with timezone offset
-    const localTime = new Date();
-    const timezoneOffsetMinutes = localTime.getTimezoneOffset();
-    // Adjust the time to the next midnight in GMT+11
-    const midnight = new Date(localTime.getTime() + (11 * 60 + timezoneOffsetMinutes) * 60 * 1000);
-    midnight.setUTCHours(13, 0, 0, 0);
-    if (localTime >= midnight) {
-        midnight.setUTCDate(midnight.getUTCDate() + 1);
-    }
-    // Get the elements to update the countdown timer
+    // Create a new Date object
+    const now = new Date();
+    const utcTime = now.getTime();
+    const timezoneOffset = now.getTimezoneOffset();
+    const gmtPlus11Time = utcTime + (11 * 60 * 60 * 1000) + (timezoneOffset * 60 * 1000);
+    const gmtPlus11Date = new Date(gmtPlus11Time);
+    // Create a new Date object for midnight
+    const midnight = new Date(gmtPlus11Date.getFullYear(), gmtPlus11Date.getMonth(), gmtPlus11Date.getDate());
+    midnight.setHours(24);
+    midnight.setMinutes(0);
+    midnight.setSeconds(0);
+    // Get countdown element
     const timeToReset = document.getElementById("timeToReset");
-    // Update the countdown timer every second
-    setInterval(() => {
-        // Get the current local time with timezone offset
-        const now = new Date();
-        const timezoneOffsetMinutes = now.getTimezoneOffset();
-        // Calculate the remaining time until midnight in GMT+11
-        const remainingTime = midnight.getTime() - (now.getTime() + (11 * 60 + timezoneOffsetMinutes) * 60 * 1000);
-
-        // If the countdown has reached zero, reset it to the next midnight
-        if (remainingTime <= 0) {
-            midnight.setUTCDate(midnight.getUTCDate() + 1);
+    // Update the time remaining every second
+    const interval = setInterval(() => {
+        // Calculate the time difference in milliseconds
+        const timeDifference = midnight.getTime() - gmtPlus11Date.getTime();
+        // Check if we've reached midnight
+        if (timeDifference <= 0) {
+            clearInterval(interval);
+            return;
         }
-        // Format the time to something relative
-        const hours = Math.floor(remainingTime / (1000 * 60 * 60)).toString().padStart(2, "0");
-        const minutes = Math.floor((remainingTime / (1000 * 60)) % 60).toString().padStart(2, "0");
-        const seconds = Math.floor((remainingTime / 1000) % 60).toString().padStart(2, "0");
-        const formattedTime = `${hours}h ${minutes}m ${seconds}s`;
-
-        // Update the countdown element
-        timeToReset.innerText = `Queue resets in ${formattedTime}`;
+        // Convert milliseconds to hours, minutes, and seconds
+        const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+        // Format the time remaining as a string
+        const timeString = `${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
+        // Display the time remaining
+        timeToReset.innerText = `Queue resets in ${timeString}`;
+        // Update the current GMT+11 time
+        const now = new Date();
+        const utcTime = now.getTime();
+        const timezoneOffset = now.getTimezoneOffset();
+        const gmtPlus11Time = utcTime + (11 * 60 * 60 * 1000) + (timezoneOffset * 60 * 1000);
+        gmtPlus11Date.setTime(gmtPlus11Time);
     }, 1000);
 
     // Play queue button animation

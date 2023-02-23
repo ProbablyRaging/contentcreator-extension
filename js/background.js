@@ -37,11 +37,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 setTimeout(async () => {
                     const { muteQueue } = await chrome.storage.sync.get(['muteQueue']) || false;
                     chrome.tabs.update(window.tabs[0].id, { muted: muteQueue });
+                    getQueueAndPlay(window.tabs[0].id);
                 }, 3000);
             } catch (err) {
                 console.log('There was a problem : ', err);
             }
-            getQueueAndPlay(window.tabs[0].id);
         });
     }
     // If the user isn't signed in to youtube
@@ -105,7 +105,7 @@ function handleAuthentication(success) {
 
 let preventNext;
 let monitorCheck;
-let activeListener;
+// let activeListener;
 let statusChangeCount = 0;
 async function getQueueAndPlay(tabId) {
     const videoIds = await getVideoList();
@@ -139,7 +139,7 @@ async function getQueueAndPlay(tabId) {
                     if (chrome.runtime.lastError) return;
                     if (!monitorCheck) initMonitoring(tab, urlToOpen);
                     // Add a listener to check if a page is refreshed or manually navigated
-                    if (!activeListener) listenForTabUpdates(tab);
+                    // if (!activeListener) listenForTabUpdates(tab);
                     // Send a message to like the video
                     sendTabMessage(tab, { sendLike: true, tabId: tab.id, videoId: videoIds[index] });
                     // Send a message to block page interactions
@@ -191,35 +191,37 @@ function initMonitoring(tab, url) {
     setTimeout(() => {
         chrome.tabs.get(tab.id, function (tab) {
             if (tab.url !== url) {
-                chrome.tabs.remove(tab.id);
+                chrome.storage.sync.set({ activeQueue: true });
                 clearInterval(monitorCheck);
+                const errorMessage = `Unable to load the video page for ${url}`;
+                chrome.tabs.update(tabId, { url: `http://54.79.93.12/error?message=${errorMessage}` });
                 return;
             }
         });
-    }, 5000);
+    }, 10000);
 
 }
 
-function listenForTabUpdates(tab) {
-    function listenerFunc(tabId, changeInfo, thisTab) {
-        if (tabId === tab.id) {
-            if (changeInfo.status === 'loading' && (!changeInfo.url || !changeInfo.url.includes('success'))) statusChangeCount++
-            if (statusChangeCount > 2) {
-                try {
-                    preventNext = true;
-                    chrome.storage.sync.set({ activeQueue: false });
-                    chrome.tabs.onUpdated.removeListener(listenerFunc);
-                    const errorMessage = 'Blocked user input was detected. Please do not try to interact with tabs in the queue window'
-                    chrome.tabs.update(tabId, { url: `http://54.79.93.12/error?message=${errorMessage}` });
-                } catch (err) {
-                    console.log('There was a problem : ', err);
-                }
-            }
-        }
-    }
-    chrome.tabs.onUpdated.addListener(listenerFunc);
-    activeListener = true;
-}
+// function listenForTabUpdates(tab) {
+//     function listenerFunc(tabId, changeInfo, thisTab) {
+//         if (tabId === tab.id) {
+//             if (changeInfo.status === 'loading' && (!changeInfo.url || !changeInfo.url.includes('success'))) statusChangeCount++
+//             if (statusChangeCount > 2) {
+//                 try {
+//                     preventNext = true;
+//                     chrome.storage.sync.set({ activeQueue: false });
+//                     chrome.tabs.onUpdated.removeListener(listenerFunc);
+//                     const errorMessage = 'Blocked user input was detected. Please do not try to interact with tabs in the queue window'
+//                     chrome.tabs.update(tabId, { url: `http://54.79.93.12/error?message=${errorMessage}` });
+//                 } catch (err) {
+//                     console.log('There was a problem : ', err);
+//                 }
+//             }
+//         }
+//     }
+//     chrome.tabs.onUpdated.addListener(listenerFunc);
+//     activeListener = true;
+// }
 
 function sendTabMessage(tab, message) {
     const statusCheck = setInterval(() => {
