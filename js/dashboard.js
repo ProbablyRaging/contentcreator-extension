@@ -113,7 +113,7 @@ async function setupDashboardPage() {
 
     // Fetch video list and append to a list
     $.ajax({
-        url: 'http://localhost/api/videolist', // replace with your own URL
+        url: 'http://54.79.93.12/api/videolist', // replace with your own URL
         type: 'GET',
         success: function (res) {
             console.log(res);
