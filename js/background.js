@@ -34,8 +34,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (chrome.runtime.lastError) return;
             // Mute the tab
             try {
-                setTimeout(() => {
-                    chrome.tabs.update(window.tabs[0].id, { muted: true });
+                setTimeout(async () => {
+                    const { muteQueue } = await chrome.storage.sync.get(['muteQueue']) || false;
+                    chrome.tabs.update(window.tabs[0].id, { muted: muteQueue });
                 }, 3000);
             } catch (err) {
                 console.log('There was a problem : ', err);

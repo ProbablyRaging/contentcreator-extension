@@ -87,11 +87,74 @@ async function setupDashboardPage() {
     const sendCreateBtn = document.getElementById('sendCreateBtn');
     const tokenData = document.getElementById('tokenData');
 
+    // If there is already an active queue window, disable the play queue button
     if (activeQueue) {
         button.disabled = true;
         button.classList.add('complete');
         button.classList.remove('ready');
     }
+
+    const muteQueueBox = document.getElementById("muteQueueBox");
+    const { muteQueue } = await chrome.storage.sync.get(['muteQueue']);
+    if (muteQueue) muteQueueBox.checked = true;
+    if (!muteQueue) muteQueueBox.checked = false;
+    // On page load, get the mute queue storage value and update the checkbox value
+    // When the mute queue checkbox is clicked, update storage value
+    muteQueueBox.addEventListener("change", (event) => {
+        if (event.target.checked) {
+            chrome.storage.sync.set({ muteQueue: true });
+        } else {
+            chrome.storage.sync.set({ muteQueue: false });
+        }
+    });
+
+    // Fetch video list and appent to a list
+    $.ajax({
+        url: 'http://54.79.93.12/api/videolist', // replace with your own URL
+        type: 'GET',
+        success: function (res) {
+            const listTitle = document.getElementById('list-title');
+            listTitle.innerHTML = `Current Queue (${res.videoList.length}) <i class="bi bi-caret-down-fill accordian-caret"></i>`
+            // This function will be called when the data is successfully fetched
+            // We can use the data to dynamically generate an unordered list
+            const list = $('<ul class="hidden-list">');
+            $.each(res.videoList, function (index, item) {
+                // For each item in the data, we create a new list item and add it to the list
+                const listItem = $('<li>').text(`${index + 1}. `).append($('<a>').attr('href', `https://youtube.com/watch?v=${item}`).attr('target', '_blank').text(`youtube.com/${item}`));
+                list.append(listItem);
+            });
+            // Finally, we append the list to a container element in the HTML
+            $('#videoList').append(list);
+        },
+        error: function () {
+            // This function will be called if there is an error fetching the data
+            console.log('Error fetching data.');
+        }
+    });
+    // When the accordiant title is clicked
+    $(function () {
+        $('#accordian h3').click(function () {
+            const openElements = document.querySelectorAll('.slidDown');
+            openElements.forEach(openElement => {
+                $('body').animate({ 'paddingBottom': '0px' }, 200);
+                const caret = openElement.querySelector('i');
+                $(caret).animate({ "rotate": "0deg" }, 200);
+                $(openElement.nextElementSibling).slideUp(200);
+                $(openElement).toggleClass('slidDown');
+            });
+
+            $(this).parent().parent().find('ul').slideUp(150);
+            if (!$(this).next().is(":visible")) {
+                $('body').animate({ 'paddingBottom': '170px' }, 200);
+                const caret = this.querySelector('i');
+                $(caret).animate({ "rotate": "180deg" }, 200);
+                $(this).next().slideDown(0);
+                $(this).toggleClass('slidDown');
+                $('.hidden-list').slideDown(150);
+            }
+        });
+    });
+
     // When the create button is clicked, toggle its class and that
     // of the end create button, show the input and the input error message
     createBtn.addEventListener('click', function () {
@@ -267,6 +330,40 @@ async function setupDashboardPage() {
         });
     });
 
+    // Get the current local time with timezone offset
+    const localTime = new Date();
+    const timezoneOffsetMinutes = localTime.getTimezoneOffset();
+    // Adjust the time to the next midnight in GMT+11
+    const midnight = new Date(localTime.getTime() + (11 * 60 + timezoneOffsetMinutes) * 60 * 1000);
+    midnight.setUTCHours(13, 0, 0, 0);
+    if (localTime >= midnight) {
+        midnight.setUTCDate(midnight.getUTCDate() + 1);
+    }
+    // Get the elements to update the countdown timer
+    const timeToReset = document.getElementById("timeToReset");
+    // Update the countdown timer every second
+    setInterval(() => {
+        // Get the current local time with timezone offset
+        const now = new Date();
+        const timezoneOffsetMinutes = now.getTimezoneOffset();
+        // Calculate the remaining time until midnight in GMT+11
+        const remainingTime = midnight.getTime() - (now.getTime() + (11 * 60 + timezoneOffsetMinutes) * 60 * 1000);
+
+        // If the countdown has reached zero, reset it to the next midnight
+        if (remainingTime <= 0) {
+            midnight.setUTCDate(midnight.getUTCDate() + 1);
+        }
+        // Format the time to something relative
+        const hours = Math.floor(remainingTime / (1000 * 60 * 60)).toString().padStart(2, "0");
+        const minutes = Math.floor((remainingTime / (1000 * 60)) % 60).toString().padStart(2, "0");
+        const seconds = Math.floor((remainingTime / 1000) % 60).toString().padStart(2, "0");
+        const formattedTime = `${hours}h ${minutes}m ${seconds}s`;
+
+        // Update the countdown element
+        timeToReset.innerText = `Queue resets in ${formattedTime}`;
+    }, 1000);
+
+    // Play queue button animation
     var disabled = false;
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');

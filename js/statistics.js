@@ -37,6 +37,7 @@ function setupStatsPage() {
 
     setTimeout(() => {
         $('.stats-box').animate({ opacity: 1 }, 300);
+        $('.stats-countdown').animate({ opacity: 1 }, 300);
         $('.footer').animate({ opacity: 1 }, 300);
     }, 770);
 
@@ -73,4 +74,36 @@ function setupStatsPage() {
             });
         }, 200);
     });
+
+    // Get the current local time with timezone offset
+    const localTime = new Date();
+    const timezoneOffsetMinutes = localTime.getTimezoneOffset();
+
+    // Adjust the time to the next hour in the local timezone
+    const nextHour = new Date(localTime);
+    nextHour.setMinutes(nextHour.getMinutes() + 60 - nextHour.getMinutes() % 60);
+    nextHour.setSeconds(0);
+    nextHour.setMilliseconds(0);
+
+    // Get the elements to update the countdown timer
+    const timeToReset = document.getElementById("timeToReset");
+
+    // Update the countdown timer every second
+    setInterval(() => {
+        // Get the current local time with timezone offset
+        const now = new Date();
+        const timezoneOffsetMinutes = now.getTimezoneOffset();
+
+        // Calculate the remaining time until the next hour in the local timezone
+        const remainingTime = nextHour.getTime() - now.getTime();
+
+        // Format the time to something relative
+        const hours = Math.floor(remainingTime / (1000 * 60 * 60)).toString().padStart(2, "0");
+        const minutes = Math.floor((remainingTime / (1000 * 60)) % 60).toString().padStart(2, "0");
+        const seconds = Math.floor((remainingTime / 1000) % 60).toString().padStart(2, "0");
+        const formattedTime = `${hours}h ${minutes}m ${seconds}s`;
+
+        // Update the countdown element
+        timeToReset.innerText = `Stats update in ${formattedTime}`;
+    }, 1000);
 }

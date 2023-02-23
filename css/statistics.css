@@ -12,7 +12,6 @@
     top: 50;
     padding: 10px;
     line-height: 0px;
-    margin-bottom: 120px;
 }
 
 .stats-text {
@@ -22,6 +21,17 @@
 .stats-number {
     font-size: 20px;
     color: #62a1e3;
+}
+
+.stats-countdown {
+    opacity: 0;
+    position: relative;
+    top: 70px;
+    font-size: 12px;
+    line-height: 1px;
+    background-color: #00000059;
+    padding: 14px;
+    border-radius: 6px;
 }
 
 .footer .bi-arrow-left {

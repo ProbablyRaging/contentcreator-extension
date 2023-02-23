@@ -4,6 +4,8 @@
             <p class="title-welcome">Welcome, data.result.username</p>
         </div>
 
+        <p id="timeToReset" class="container-body queue-countdown"></p>
+
         <div class="play-button">
             <button id="button" class="ready">
                 <div class="message submitMessage">
@@ -31,8 +33,20 @@
         </div>
 
         <div class="content-container">
-            <p id="containerBody" class="container-body">Play your queue to earn tokens</p>
-            <p id="watchCount" class="container-body-lg">video views today</p>            
+            <label class="checkbox-wrapper">
+                <input id="muteQueueBox" type="checkbox" name="muteQueueBox" value="1">
+                Mute queue window
+            </label>
+
+            <p id="watchCount" class="container-body-lg">video views today</p>
+        </div>
+
+        <div id="accordian">
+            <h3 id="list-title">Current Queue (0) <i class="bi bi-caret-down-fill accordian-caret"></i></h3>
+            <ul class="unordered-list">
+                <li id="videoList" class="video-list">
+                </li>
+            </ul>
         </div>
 
         <div class="footer">
