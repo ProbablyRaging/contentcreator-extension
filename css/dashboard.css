@@ -381,21 +381,12 @@ button.complete .successMessage svg {
     animation-delay: 0.2s;
 }
 
-
-
-
-
-
-
-
-
-
-
 #accordian tooltip {
     font-size: 10px;
 }
 
 #accordian {
+    opacity: 0;
     max-width: 300px;
     min-width: 300px;
     position: relative;

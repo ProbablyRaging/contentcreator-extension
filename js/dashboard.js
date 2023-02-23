@@ -47,6 +47,7 @@ async function setupDashboardPage() {
     setTimeout(() => {
         $('.content-container').animate({ opacity: 1 }, 300);
         $('.play-button').animate({ opacity: 1 }, 300);
+        $('#accordian').animate({ opacity: 1 }, 300);
         $('.footer').animate({ opacity: 1 }, 300);
     }, 770);
 

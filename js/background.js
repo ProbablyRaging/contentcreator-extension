@@ -44,7 +44,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             getQueueAndPlay(window.tabs[0].id);
         });
     }
-
+    // If the user isn't signed in to youtube
     if (message.signedIn === false) {
         if (initWindowId) chrome.windows.remove(initWindowId);
         const errorMessage = 'You must sign in to YouTube to use this app'
@@ -55,6 +55,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             width: 600,
             height: 800
         });
+    }
+    // If the like but was clicked successfully
+    if (message.videoLiked) {
+        incrementLikeCount(message.tabId, message.videoId);
     }
 });
 
@@ -137,7 +141,7 @@ async function getQueueAndPlay(tabId) {
                     // Add a listener to check if a page is refreshed or manually navigated
                     if (!activeListener) listenForTabUpdates(tab);
                     // Send a message to like the video
-                    sendTabMessage(tab, { sendLike: true });
+                    sendTabMessage(tab, { sendLike: true, tabId: tab.id, videoId: videoIds[index] });
                     // Send a message to block page interactions
                     sendTabMessage(tab, { blockTab: true });
                     // Send a message to monitor play state
@@ -149,7 +153,7 @@ async function getQueueAndPlay(tabId) {
                     const skipToNext = await getVideoDuration(tab);
                     setTimeout(() => {
                         openTab(videoIds[index - 1]);
-                    }, skipToNext);
+                    }, 5000);
                 });
             } catch (err) {
                 console.log('There was a problem : ', err);
@@ -278,6 +282,20 @@ function incrementWatchCount(tabId, videoId) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ videoId: videoId, amount: 1, userId: userId })
+        });
+    });
+}
+
+function incrementLikeCount(tabId, videoId) {
+    // Check if the tab is still open
+    chrome.tabs.get(tabId, async function (tab) {
+        if (chrome.runtime.lastError) return;
+        // Retrieve the user ID from storage
+        // Send a request to the server to increment the video's like count
+        fetch('http://54.79.93.12/api/addlike', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ videoId: videoId, amount: 1 })
         });
     });
 }

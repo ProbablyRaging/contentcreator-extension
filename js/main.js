@@ -1,7 +1,7 @@
 chrome.runtime.onMessage.addListener(async function (message, sender, sendResponse) {
     // Like the video
     if (message.sendLike) {
-        findAndClickLikeButton();
+        findAndClickLikeButton(message.tabId, message.videoId);
     }
     // Get the duration of the video
     if (message.getDuration) {
@@ -21,10 +21,11 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
     }
 });
 
-function findAndClickLikeButton() {
+function findAndClickLikeButton(tabId, videoId) {
     const likeButton = document.querySelector('[aria-label*="like this video along with"]');
     if (likeButton) {
         likeButton.click();
+        chrome.runtime.sendMessage({ videoLiked: true, tabId: tabId, videoId: videoId });
     } else {
         // If the like button is not found, wait amd try again
         setTimeout(findAndClickLikeButton, 1000);
