@@ -393,10 +393,6 @@ button.complete .successMessage svg {
     top: 168px;
 }
 
-#accordian span {
-    opacity: 0;
-}
-
 /*heading styles*/
 #accordian h3 {
     display: flex;
@@ -417,14 +413,10 @@ button.complete .successMessage svg {
     filter: brightness(1.3);
 }
 
-#accordian h3:hover span {
-    opacity: 1;
-}
 
 /*iconfont styles*/
-#accordian h3 span {
-    font-size: 16px;
-    margin-right: 10px;
+#accordian span {
+    font-size: 12px;
 }
 
 /*list items*/

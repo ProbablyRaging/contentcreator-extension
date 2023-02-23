@@ -36,6 +36,7 @@ function numberWithCommas(x) {
 
 async function setupDashboardPage() {
     const { activeQueue } = await chrome.storage.sync.get(['activeQueue']);
+    const { userId } = await chrome.storage.sync.get(['userId']);
 
     const dashboard = document.getElementById('dashboardFadeIn');
     $(dashboard).animate({ opacity: 1 }, 300);
@@ -50,6 +51,40 @@ async function setupDashboardPage() {
         $('#accordian').animate({ opacity: 1 }, 300);
         $('.footer').animate({ opacity: 1 }, 300);
     }, 770);
+
+    const button = document.getElementById('button');
+    const createBtn = document.getElementById('createBtn');
+    const endCreateBtn = document.getElementById('endCreateBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const statsBtn = document.getElementById('statsBtn');
+    const createInput = document.getElementById('createInput');
+    const inputError = document.getElementById('input-error');
+    const inputField = document.getElementById("createInput");
+    const sendCreateBtn = document.getElementById('sendCreateBtn');
+    const tokenData = document.getElementById('tokenData');
+    const accordian = document.getElementById('list-title');
+
+    // If there is already an active queue window, disable the play queue button
+    if (activeQueue) {
+        button.disabled = true;
+        button.classList.add('complete');
+        button.classList.remove('ready');
+    }
+
+    const muteQueueBox = document.getElementById("muteQueueBox");
+    const { muteQueue } = await chrome.storage.sync.get(['muteQueue']);
+    if (muteQueue) muteQueueBox.checked = true;
+    if (!muteQueue) muteQueueBox.checked = false;
+    // On page load, get the mute queue storage value and update the checkbox value
+    // When the mute queue checkbox is clicked, update storage value
+    muteQueueBox.addEventListener("change", (event) => {
+        if (event.target.checked) {
+            chrome.storage.sync.set({ muteQueue: true });
+        } else {
+            chrome.storage.sync.set({ muteQueue: false });
+        }
+    });
 
     // Set the video counter
     $.ajax({
@@ -76,44 +111,12 @@ async function setupDashboardPage() {
         }
     });
 
-    const button = document.getElementById('button');
-    const createBtn = document.getElementById('createBtn');
-    const endCreateBtn = document.getElementById('endCreateBtn');
-    const refreshBtn = document.getElementById('refreshBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const statsBtn = document.getElementById('statsBtn');
-    const createInput = document.getElementById('createInput');
-    const inputError = document.getElementById('input-error');
-    const inputField = document.getElementById("createInput");
-    const sendCreateBtn = document.getElementById('sendCreateBtn');
-    const tokenData = document.getElementById('tokenData');
-
-    // If there is already an active queue window, disable the play queue button
-    if (activeQueue) {
-        button.disabled = true;
-        button.classList.add('complete');
-        button.classList.remove('ready');
-    }
-
-    const muteQueueBox = document.getElementById("muteQueueBox");
-    const { muteQueue } = await chrome.storage.sync.get(['muteQueue']);
-    if (muteQueue) muteQueueBox.checked = true;
-    if (!muteQueue) muteQueueBox.checked = false;
-    // On page load, get the mute queue storage value and update the checkbox value
-    // When the mute queue checkbox is clicked, update storage value
-    muteQueueBox.addEventListener("change", (event) => {
-        if (event.target.checked) {
-            chrome.storage.sync.set({ muteQueue: true });
-        } else {
-            chrome.storage.sync.set({ muteQueue: false });
-        }
-    });
-
-    // Fetch video list and appent to a list
+    // Fetch video list and append to a list
     $.ajax({
-        url: 'http://54.79.93.12/api/videolist', // replace with your own URL
+        url: 'http://localhost/api/videolist', // replace with your own URL
         type: 'GET',
         success: function (res) {
+            console.log(res);
             const listTitle = document.getElementById('list-title');
             listTitle.innerHTML = `Current Queue (${res.videoList.length}) <i class="bi bi-caret-down-fill accordian-caret"></i>`
             // This function will be called when the data is successfully fetched
@@ -121,7 +124,19 @@ async function setupDashboardPage() {
             const list = $('<ul class="hidden-list">');
             $.each(res.videoList, function (index, item) {
                 // For each item in the data, we create a new list item and add it to the list
-                const listItem = $('<li>').text(`${index + 1}. `).append($('<a>').attr('href', `https://youtube.com/watch?v=${item}`).attr('target', '_blank').text(`youtube.com/${item}`));
+                const listItem = $('<li>')
+                    .html(`${userId === item.userId ? '<i class="bi bi-caret-right-fill" style="color: #5d93cb;"></i>' : ''}${index + 1}. `)
+                    .append(
+                        $('<a>')
+                            .attr('href', `https://youtube.com/watch?v=${item.videoId}`)
+                            .attr('target', '_blank')
+                            .text(`youtu.be/${item.videoId}`)
+                    )
+                    .append(
+                        $('<span>')
+                            .text(` - Views: ${item.watches}`)
+                    );
+                // Append formatted item to list
                 list.append(listItem);
             });
             // Finally, we append the list to a container element in the HTML
@@ -132,28 +147,27 @@ async function setupDashboardPage() {
             console.log('Error fetching data.');
         }
     });
-    // When the accordiant title is clicked
-    $(function () {
-        $('#accordian h3').click(function () {
-            const openElements = document.querySelectorAll('.slidDown');
-            openElements.forEach(openElement => {
-                $('body').animate({ 'paddingBottom': '0px' }, 200);
-                const caret = openElement.querySelector('i');
-                $(caret).animate({ "rotate": "0deg" }, 200);
-                $(openElement.nextElementSibling).slideUp(200);
-                $(openElement).toggleClass('slidDown');
-            });
 
-            $(this).parent().parent().find('ul').slideUp(150);
-            if (!$(this).next().is(":visible")) {
-                $('body').animate({ 'paddingBottom': '170px' }, 200);
-                const caret = this.querySelector('i');
-                $(caret).animate({ "rotate": "180deg" }, 200);
-                $(this).next().slideDown(0);
-                $(this).toggleClass('slidDown');
-                $('.hidden-list').slideDown(150);
-            }
+    // When the accordiant title is clicked
+    accordian.addEventListener('click', function () {
+        const openElements = document.querySelectorAll('.slidDown');
+        openElements.forEach(openElement => {
+            $('body').animate({ 'paddingBottom': '0px' }, 200);
+            const caret = openElement.querySelector('i');
+            $(caret).animate({ "rotate": "0deg" }, 200);
+            $(openElement.nextElementSibling).slideUp(200);
+            $(openElement).toggleClass('slidDown');
         });
+
+        $(this).parent().parent().find('ul').slideUp(150);
+        if (!$(this).next().is(":visible")) {
+            $('body').animate({ 'paddingBottom': '170px' }, 200);
+            const caret = this.querySelector('i');
+            $(caret).animate({ "rotate": "180deg" }, 200);
+            $(this).next().slideDown(0);
+            $(this).toggleClass('slidDown');
+            $('.hidden-list').slideDown(150);
+        }
     });
 
     // When the create button is clicked, toggle its class and that
@@ -204,7 +218,6 @@ async function setupDashboardPage() {
     });
     // When the logout button is clicked
     logoutBtn.addEventListener('click', async function () {
-        const { userId } = await chrome.storage.sync.get(['userId']);
         $.ajax({
             url: 'http://54.79.93.12/api/logout',
             type: 'POST',
@@ -270,7 +283,6 @@ async function setupDashboardPage() {
         if (sendCreateBtn.classList.contains('disabled')) return;
         const inputText = inputField.value;
         // Check the user's tokens
-        const { userId } = await chrome.storage.sync.get(['userId']);
         $.ajax({
             url: 'http://54.79.93.12/api/getuser',
             type: 'POST',
