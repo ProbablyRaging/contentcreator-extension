@@ -116,7 +116,6 @@ async function setupDashboardPage() {
         url: 'http://54.79.93.12/api/videolist', // replace with your own URL
         type: 'GET',
         success: function (res) {
-            console.log(res);
             const listTitle = document.getElementById('list-title');
             listTitle.innerHTML = `Current Queue (${res.videoList.length}) <i class="bi bi-caret-down-fill accordian-caret"></i>`
             // This function will be called when the data is successfully fetched

@@ -70,6 +70,14 @@ function blockTabInteractions() {
             interactionBlocker.style.height = '100%';
             interactionBlocker.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
             interactionBlocker.style.zIndex = '999999';
+            interactionBlocker.style.fontSize = '40px';
+            interactionBlocker.style.color = 'white';
+            interactionBlocker.style.display = 'flex';
+            interactionBlocker.style.justifyContent = 'center';
+            interactionBlocker.style.alignItems = 'center';
+            interactionBlocker.oncontextmenu = function () {
+                return false;
+            };
             document.body.appendChild(interactionBlocker);
         }
         const checkStyles = document.getElementById('interactionBlocker').getAttribute('style');
@@ -84,6 +92,14 @@ function blockTabInteractions() {
             interactionBlocker.style.height = '100%';
             interactionBlocker.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
             interactionBlocker.style.zIndex = '999999';
+            interactionBlocker.style.fontSize = '30px';
+            interactionBlocker.style.color = 'white';
+            interactionBlocker.style.display = 'flex';
+            interactionBlocker.style.justifyContent = 'center';
+            interactionBlocker.style.alignItems = 'center';
+            interactionBlocker.oncontextmenu = function () {
+                return false;
+            };
             blockTabInteractions();
             return;
         }
@@ -101,12 +117,50 @@ function preventPausingVideos() {
                 const buttonState = document.querySelector('.ytp-play-button').getAttribute('data-title-no-tooltip');
                 if (buttonState === 'Play') {
                     playButton.click();
+                    setTimeout(() => {
+                        const newButtonState = document.querySelector('.ytp-play-button').getAttribute('data-title-no-tooltip');
+                        if (newButtonState === 'Play') AddTextToBlocker();
+                    }, 1000);
                 }
             }, 1000);
         } else {
             // If the play buttons is not found, wait amd try again
             setTimeout(preventPausingVideos, 1000);
         }
+    }
+}
+
+function AddTextToBlocker() {
+    if (document.querySelector('#interactionBlockerText')) return;
+    const intBlocker = document.querySelector('#interactionBlocker');
+    if (intBlocker) {
+        const blockerText = document.createElement('interaction-blocker-text');
+        blockerText.id = 'interactionBlockerText';
+        blockerText.innerText = 'Click To Play - 15s';
+        blockerText.style.backgroundColor = '#292b30';
+        blockerText.style.padding = '10px';
+        blockerText.style.borderRadius = '10px';
+        blockerText.style.cursor = 'pointer';
+        intBlocker.appendChild(blockerText);
+        blockerText.onclick = function () {
+            this.remove();
+        }
+        // Countdown
+        let countdown = 15;
+        const countdownInterval = setInterval(() => {
+            console.log(countdown);
+            const textDiv = document.querySelector('#interactionBlockerText');
+            if (!textDiv) return;
+            if (countdown === 0) {
+                chrome.runtime.sendMessage({ noResponse: true });
+                clearInterval(countdownInterval);
+            } else {
+                blockerText.innerText = `Click To Play - ${countdown}s`;
+                countdown--;
+            }
+        }, 1000);
+    } else {
+        setTimeout(AddTextToBlocker, 1000);
     }
 }
 

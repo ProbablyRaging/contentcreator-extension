@@ -22,25 +22,37 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Play queue button
     if (message.queue) {
         // Create a popup window for watching video queues
+        const successMessage = 'Loading queue..'
         chrome.windows.create({
-            url: 'https://www.youtube.com/',
+            url: `http://54.79.93.12/success?message=${successMessage}`,
             focused: true,
             type: 'panel',
             width: 600,
             height: 800,
-        }, function (window) {
+        }, async function (window) {
             initWindowId = window.id;
             // Stop executing if the window is closed
             if (chrome.runtime.lastError) return;
-            // Mute the tab
             try {
-                setTimeout(async () => {
-                    const { muteQueue } = await chrome.storage.sync.get(['muteQueue']) || false;
-                    chrome.tabs.update(window.tabs[0].id, { muted: muteQueue });
-                    getQueueAndPlay(window.tabs[0].id);
-                }, 3000);
+                // Mute the tab
+                const tabs = window.tabs;
+                if (tabs && tabs.length > 0 && tabs[0].id) {
+                    const { muteQueue } = await chrome.storage.sync.get({ muteQueue: false });
+                    chrome.tabs.update(tabs[0].id, { muted: muteQueue }, function (tab) {
+                        if (chrome.runtime.lastError) return;
+                        if (tab && tab.id) {
+                            setTimeout(() => {
+                                getQueueAndPlay(tab.id);
+                            }, 3000);
+                        } else {
+                            console.error('No tab found in the window');
+                        }
+                    });
+                } else {
+                    console.error('No tab found in the window');
+                }
             } catch (err) {
-                console.log('There was a problem : ', err);
+                console.error('There was a problem: ', err);
             }
         });
     }
@@ -59,6 +71,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // If the like but was clicked successfully
     if (message.videoLiked) {
         incrementLikeCount(message.tabId, message.videoId);
+    }
+    // If chrome user doesn't interact with window in time
+    if (message.noResponse) {
+        if (initWindowId) chrome.windows.remove(initWindowId);
+        const errorMessage = 'You did not interact with the window in time'
+        chrome.windows.create({
+            url: `http://54.79.93.12/error?message=${errorMessage}`,
+            focused: true,
+            type: 'panel',
+            width: 600,
+            height: 800
+        });
     }
 });
 
@@ -121,6 +145,7 @@ async function getQueueAndPlay(tabId) {
     }
     let index = 0;
     function openTab(previousVideoId) {
+        clearInterval(monitorCheck);
         // Used to determine if the function should continue, can be flagged
         // by multiple different functions
         if (preventNext) return;
@@ -137,7 +162,7 @@ async function getQueueAndPlay(tabId) {
                 const urlToOpen = `https://www.youtube.com/watch?v=${videoIds[index]}`;
                 chrome.tabs.update(tabId, { url: urlToOpen }, async function (tab) {
                     if (chrome.runtime.lastError) return;
-                    if (!monitorCheck) initMonitoring(tab, urlToOpen);
+                    initMonitoring(tab, urlToOpen);
                     // Add a listener to check if a page is refreshed or manually navigated
                     // if (!activeListener) listenForTabUpdates(tab);
                     // Send a message to like the video
@@ -153,7 +178,7 @@ async function getQueueAndPlay(tabId) {
                     const skipToNext = await getVideoDuration(tab);
                     setTimeout(() => {
                         openTab(videoIds[index - 1]);
-                    }, skipToNext);
+                    }, 6000000);
                 });
             } catch (err) {
                 console.log('There was a problem : ', err);
@@ -177,7 +202,9 @@ async function getQueueAndPlay(tabId) {
 function initMonitoring(tab, url) {
     chrome.storage.sync.set({ activeQueue: true });
     // Check the status of the tab every second
+    console.log('Starting..');
     monitorCheck = setInterval(() => {
+        console.log('Running..');
         // If the user closes the tab early, stop monitoring
         chrome.tabs.get(tab.id, function (tab) {
             if (chrome.runtime.lastError) {
@@ -185,21 +212,16 @@ function initMonitoring(tab, url) {
                 clearInterval(monitorCheck);
                 return;
             }
-        });
-    }, 1000);
-
-    setTimeout(() => {
-        chrome.tabs.get(tab.id, function (tab) {
             if (tab.url !== url) {
-                chrome.storage.sync.set({ activeQueue: true });
+                preventNext = true;
+                chrome.storage.sync.set({ activeQueue: false });
                 clearInterval(monitorCheck);
-                const errorMessage = `Unable to load the video page for ${url}`;
-                chrome.tabs.update(tabId, { url: `http://54.79.93.12/error?message=${errorMessage}` });
+                const errorMessage = `URL mismatch. Expected ${url} but got ${tab.url}`;
+                chrome.tabs.update(tab.id, { url: `http://54.79.93.12/error?message=${errorMessage}` });
                 return;
             }
         });
-    }, 10000);
-
+    }, 1000);
 }
 
 // function listenForTabUpdates(tab) {
