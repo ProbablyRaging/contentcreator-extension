@@ -26,11 +26,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         chrome.windows.create({
             url: `http://54.79.93.12/success?message=${successMessage}`,
             focused: true,
-            type: 'panel',
             width: 600,
             height: 800,
         }, async function (window) {
             initWindowId = window.id;
+            // Check browser name
+            const delaySecondTab = navigator.userAgent.includes('Chrome') ? 15000 : 7000;
             // Stop executing if the window is closed
             if (chrome.runtime.lastError) return;
             try {
@@ -51,7 +52,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                     setTimeout(() => {
                         const successMessage = 'Loading reversed queue..';
                         chrome.tabs.create({
-                            url: `http://54.79.93.12/success?message=${successMessage}`
+                            url: `http://54.79.93.12/success?message=${successMessage}`,
+                            windowId: window.id
                         }, async function (tab) {
                             if (chrome.runtime.lastError) return;
                             chrome.tabs.update(tab.id, { muted: muteQueue }, function () {
@@ -65,7 +67,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                                 }
                             });
                         });
-                    }, 7000);
+                    }, delaySecondTab);
                 } else {
                     console.error('No tab found in the window');
                 }
@@ -147,6 +149,7 @@ function handleAuthentication(success) {
 
 let preventNext;
 let monitorCheck;
+let monitorCheckTwo;
 // let activeListener;
 let statusChangeCount = 0;
 async function getQueueAndPlay(tabId, reversed) {
@@ -164,7 +167,7 @@ async function getQueueAndPlay(tabId, reversed) {
     }
     let index = 0;
     function openTab(previousVideoId) {
-        clearInterval(monitorCheck);
+        reversed ? clearInterval(monitorCheckTwo) : clearInterval(monitorCheck);
         // Used to determine if the function should continue, can be flagged
         // by multiple different functions
         if (preventNext) return;
@@ -181,7 +184,7 @@ async function getQueueAndPlay(tabId, reversed) {
                 const urlToOpen = `https://www.youtube.com/watch?v=${videoIds[index]}&t=0`;
                 chrome.tabs.update(tabId, { url: urlToOpen }, async function (tab) {
                     if (chrome.runtime.lastError) return;
-                    initMonitoring(tab, urlToOpen);
+                    reversed ? initMonitoringTwo(tab) : initMonitoring(tab);
                     // Add a listener to check if a page is refreshed or manually navigated
                     // if (!activeListener) listenForTabUpdates(tab);
                     // Send a message to like the video
@@ -197,7 +200,7 @@ async function getQueueAndPlay(tabId, reversed) {
                     const skipToNext = await getVideoDuration(tab);
                     setTimeout(() => {
                         openTab(videoIds[index - 1]);
-                    }, 7000);
+                    }, skipToNext);
                 });
             } catch (err) {
                 console.log('There was a problem : ', err);
@@ -218,17 +221,34 @@ async function getQueueAndPlay(tabId, reversed) {
 }
 
 // Sets up monitoring of the specified tab
-function initMonitoring(tab, url) {
+function initMonitoring(tab) {
     chrome.storage.sync.set({ activeQueue: true });
     // Check the status of the tab every second
-    console.log('Starting..');
     monitorCheck = setInterval(() => {
-        console.log('Running..');
         // If the user closes the tab early, stop monitoring
         chrome.tabs.get(tab.id, function (tab) {
             if (chrome.runtime.lastError) {
                 chrome.storage.sync.set({ activeQueue: false });
+                chrome.windows.remove(initWindowId);
                 clearInterval(monitorCheck);
+                clearInterval(monitorCheckTwo);
+                return;
+            }
+        });
+    }, 1000);
+}
+
+function initMonitoringTwo(tab) {
+    chrome.storage.sync.set({ activeQueue: true });
+    // Check the status of the tab every second
+    monitorCheckTwo = setInterval(() => {
+        // If the user closes the tab early, stop monitoring
+        chrome.tabs.get(tab.id, function (tab) {
+            if (chrome.runtime.lastError) {
+                chrome.storage.sync.set({ activeQueue: false });
+                chrome.windows.remove(initWindowId);
+                clearInterval(initMonitoring);
+                clearInterval(initMonitoringTwo);
                 return;
             }
         });

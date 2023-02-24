@@ -136,11 +136,12 @@ function AddTextToBlocker() {
     if (intBlocker) {
         const blockerText = document.createElement('interaction-blocker-text');
         blockerText.id = 'interactionBlockerText';
-        blockerText.innerText = 'Click To Play - 15s';
+        blockerText.innerText = 'Click To Play (15s)';
         blockerText.style.backgroundColor = '#292b30';
         blockerText.style.padding = '10px';
         blockerText.style.borderRadius = '10px';
         blockerText.style.cursor = 'pointer';
+        blockerText.style.border = '1px solid white';
         intBlocker.appendChild(blockerText);
         blockerText.onclick = function () {
             this.remove();
@@ -148,7 +149,6 @@ function AddTextToBlocker() {
         // Countdown
         let countdown = 15;
         const countdownInterval = setInterval(() => {
-            console.log(countdown);
             const textDiv = document.querySelector('#interactionBlockerText');
             if (!textDiv) {
                 clearInterval(countdownInterval)
@@ -158,7 +158,7 @@ function AddTextToBlocker() {
                 chrome.runtime.sendMessage({ noResponse: true });
                 clearInterval(countdownInterval);
             } else {
-                blockerText.innerText = `Click To Play - ${countdown}s`;
+                blockerText.innerText = `Click To Play (${countdown}s)`;
                 countdown--;
             }
         }, 1000);
