@@ -22,7 +22,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Play queue button
     if (message.queue) {
         // Create a popup window for watching video queues
-        const successMessage = 'Loading queue..'
+        const successMessage = 'Loading queue..';
         chrome.windows.create({
             url: `http://54.79.93.12/success?message=${successMessage}`,
             focused: true,
@@ -42,12 +42,30 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                         if (chrome.runtime.lastError) return;
                         if (tab && tab.id) {
                             setTimeout(() => {
-                                getQueueAndPlay(tab.id);
+                                getQueueAndPlay(tab.id, false);
                             }, 3000);
                         } else {
                             console.error('No tab found in the window');
                         }
                     });
+                    setTimeout(() => {
+                        const successMessage = 'Loading reversed queue..';
+                        chrome.tabs.create({
+                            url: `http://54.79.93.12/success?message=${successMessage}`
+                        }, async function (tab) {
+                            if (chrome.runtime.lastError) return;
+                            chrome.tabs.update(tab.id, { muted: muteQueue }, function () {
+                                if (chrome.runtime.lastError) return;
+                                if (tab && tab.id) {
+                                    setTimeout(() => {
+                                        getQueueAndPlay(tab.id, true);
+                                    }, 3000);
+                                } else {
+                                    console.error('No tab found in the window');
+                                }
+                            });
+                        });
+                    }, 7000);
                 } else {
                     console.error('No tab found in the window');
                 }
@@ -131,8 +149,9 @@ let preventNext;
 let monitorCheck;
 // let activeListener;
 let statusChangeCount = 0;
-async function getQueueAndPlay(tabId) {
-    const videoIds = await getVideoList();
+async function getQueueAndPlay(tabId, reversed) {
+    let videoIds = await getVideoList();
+    if (reversed) videoIds = videoIds.slice().reverse();
     // If there are no videos in the list
     if (!videoIds || videoIds.length < 1) {
         try {
@@ -150,7 +169,7 @@ async function getQueueAndPlay(tabId) {
         // by multiple different functions
         if (preventNext) return;
         // Award a token on previous video completion
-        if (index > 0) awardToken(tabId);
+        if (!reversed && index > 0) awardToken(tabId);
         if (previousVideoId) incrementWatchCount(tabId, previousVideoId);
         // Get the availavble video IDs, navigate to the video watch page and watch
         // the video for 10 minutes before moving on to the next video in the list
@@ -159,7 +178,7 @@ async function getQueueAndPlay(tabId) {
             statusChangeCount = 0;
             // Navigate to video page
             try {
-                const urlToOpen = `https://www.youtube.com/watch?v=${videoIds[index]}`;
+                const urlToOpen = `https://www.youtube.com/watch?v=${videoIds[index]}&t=0`;
                 chrome.tabs.update(tabId, { url: urlToOpen }, async function (tab) {
                     if (chrome.runtime.lastError) return;
                     initMonitoring(tab, urlToOpen);
@@ -178,7 +197,7 @@ async function getQueueAndPlay(tabId) {
                     const skipToNext = await getVideoDuration(tab);
                     setTimeout(() => {
                         openTab(videoIds[index - 1]);
-                    }, 6000000);
+                    }, 7000);
                 });
             } catch (err) {
                 console.log('There was a problem : ', err);
@@ -210,14 +229,6 @@ function initMonitoring(tab, url) {
             if (chrome.runtime.lastError) {
                 chrome.storage.sync.set({ activeQueue: false });
                 clearInterval(monitorCheck);
-                return;
-            }
-            if (tab.url !== url) {
-                preventNext = true;
-                chrome.storage.sync.set({ activeQueue: false });
-                clearInterval(monitorCheck);
-                const errorMessage = `URL mismatch. Expected ${url} but got ${tab.url}`;
-                chrome.tabs.update(tab.id, { url: `http://54.79.93.12/error?message=${errorMessage}` });
                 return;
             }
         });

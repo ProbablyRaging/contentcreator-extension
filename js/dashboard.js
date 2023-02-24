@@ -300,7 +300,7 @@ async function setupDashboardPage() {
                 } else {
                     // Get the value of the input field and make post request
                     $.ajax({
-                        url: 'http://54.79.93.12/api/submitvideoid',
+                        url: 'http://54.79.93.12/api/addvideo',
                         type: 'POST',
                         data: {
                             videoId: inputText,
