@@ -150,7 +150,10 @@ function AddTextToBlocker() {
         const countdownInterval = setInterval(() => {
             console.log(countdown);
             const textDiv = document.querySelector('#interactionBlockerText');
-            if (!textDiv) return;
+            if (!textDiv) {
+                clearInterval(countdownInterval)
+                return;
+            }
             if (countdown === 0) {
                 chrome.runtime.sendMessage({ noResponse: true });
                 clearInterval(countdownInterval);
