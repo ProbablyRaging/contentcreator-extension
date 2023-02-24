@@ -24,6 +24,69 @@ function checkDashboardPage() {
     reCheck();
 }
 
+function startVideoExpireTimer(expires) {
+    const timeRemaining = expires - new Date().getTime(); // time remaining in milliseconds
+    const hours = Math.floor(timeRemaining / (60 * 60 * 1000)); // calculate hours
+    const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000)); // calculate minutes
+    const seconds = Math.floor((timeRemaining % (60 * 1000)) / 1000); // calculate seconds
+    timeToReset.innerText = `Your video expires in ${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
+    setInterval(() => {
+        const timeRemaining = expires - new Date().getTime(); // time remaining in milliseconds
+        const hours = Math.floor(timeRemaining / (60 * 60 * 1000)); // calculate hours
+        const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000)); // calculate minutes
+        const seconds = Math.floor((timeRemaining % (60 * 1000)) / 1000); // calculate seconds
+        timeToReset.innerText = `Your video expires in ${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
+    }, 1000);
+}
+
+function updateTotalWatchCount(res) {
+    const watchCount = document.getElementById('watchCount');
+    watchCount.innerHTML = `<p class="wc-number count-up">0</p> ${watchCount.innerText}`;
+    $({ countNum: 0 }).animate(
+        { countNum: res.watchCount },
+        {
+            duration: 1000,
+            easing: 'linear',
+            step: function () {
+                watchCount.querySelector('.count-up').innerText = numberWithCommas(this.countNum.toFixed(0));
+            },
+            complete: function () {
+                watchCount.querySelector('.count-up').innerText = numberWithCommas(res.watchCount);
+            }
+        }
+    );
+}
+
+function updateCurrentQueueList(res, userId) {
+    const listTitle = document.getElementById('list-title');
+    listTitle.innerHTML = `Current Queue (${res.videoList.length}) <i class="bi bi-caret-down-fill accordian-caret"></i>`
+    // This function will be called when the data is successfully fetched
+    // We can use the data to dynamically generate an unordered list
+    const list = $('<ul class="hidden-list">');
+    $.each(res.videoList, function (index, item) {
+        // Start video expire countdown timer
+        if (userId === item.userId) startVideoExpireTimer(item.expires);
+
+        // For each item in the data, we create a new list item and add it to the list
+        const listItem = $('<li>')
+            .html(`${userId === item.userId ? '<i class="bi bi-caret-right-fill" style="color: #5d93cb;"></i>' : ''}${index + 1}. `)
+            .append(
+                $('<a>')
+                    .attr('href', `https://youtube.com/watch?v=${item.videoId}`)
+                    .attr('target', '_blank')
+                    .text(`youtu.be/${item.videoId}`)
+            )
+            .append(
+                $('<span>')
+                    .text(` - Views: ${item.watches}`)
+            );
+        // Append formatted item to list
+        list.append(listItem);
+    });
+    // Finally, we append the list to a container element in the HTML
+    $('#videoList').append(list);
+}
+
 function numberWithCommas(x) {
     if (x >= 1000000) {
         return (x / 1000000).toFixed(1) + 'M';
@@ -46,6 +109,7 @@ async function setupDashboardPage() {
     }, 470);
 
     setTimeout(() => {
+        $('.queue-countdown').animate({ opacity: 1 }, 300);
         $('.content-container').animate({ opacity: 1 }, 300);
         $('.play-button').animate({ opacity: 1 }, 300);
         $('#accordian').animate({ opacity: 1 }, 300);
@@ -72,12 +136,12 @@ async function setupDashboardPage() {
         button.classList.remove('ready');
     }
 
+    // On page load, get the mute queue storage value and update the checkbox value
+    // When the mute queue checkbox is clicked, update storage value
     const muteQueueBox = document.getElementById("muteQueueBox");
     const { muteQueue } = await chrome.storage.sync.get(['muteQueue']);
     if (muteQueue) muteQueueBox.checked = true;
     if (!muteQueue) muteQueueBox.checked = false;
-    // On page load, get the mute queue storage value and update the checkbox value
-    // When the mute queue checkbox is clicked, update storage value
     muteQueueBox.addEventListener("change", (event) => {
         if (event.target.checked) {
             chrome.storage.sync.set({ muteQueue: true });
@@ -86,60 +150,17 @@ async function setupDashboardPage() {
         }
     });
 
-    // Set the video counter
-    $.ajax({
-        url: 'http://54.79.93.12/api/videolist',
-        type: 'GET',
-        success: function (res) {
-            setTimeout(() => {
-                const watchCount = document.getElementById('watchCount');
-                watchCount.innerHTML = `<p class="wc-number count-up">0</p> ${watchCount.innerText}`;
-                $({ countNum: 0 }).animate(
-                    { countNum: res.watchCount },
-                    {
-                        duration: 1000,
-                        easing: 'linear',
-                        step: function () {
-                            watchCount.querySelector('.count-up').innerText = numberWithCommas(this.countNum.toFixed(0));
-                        },
-                        complete: function () {
-                            watchCount.querySelector('.count-up').innerText = numberWithCommas(res.watchCount);
-                        }
-                    }
-                );
-            }, 600);
-        }
-    });
-
-    // Fetch video list and append to a list
+    // Fetch video list, update count, and update current queue list
     $.ajax({
         url: 'http://54.79.93.12/api/videolist', // replace with your own URL
         type: 'GET',
         success: function (res) {
-            const listTitle = document.getElementById('list-title');
-            listTitle.innerHTML = `Current Queue (${res.videoList.length}) <i class="bi bi-caret-down-fill accordian-caret"></i>`
-            // This function will be called when the data is successfully fetched
-            // We can use the data to dynamically generate an unordered list
-            const list = $('<ul class="hidden-list">');
-            $.each(res.videoList, function (index, item) {
-                // For each item in the data, we create a new list item and add it to the list
-                const listItem = $('<li>')
-                    .html(`${userId === item.userId ? '<i class="bi bi-caret-right-fill" style="color: #5d93cb;"></i>' : ''}${index + 1}. `)
-                    .append(
-                        $('<a>')
-                            .attr('href', `https://youtube.com/watch?v=${item.videoId}`)
-                            .attr('target', '_blank')
-                            .text(`youtu.be/${item.videoId}`)
-                    )
-                    .append(
-                        $('<span>')
-                            .text(` - Views: ${item.watches}`)
-                    );
-                // Append formatted item to list
-                list.append(listItem);
-            });
-            // Finally, we append the list to a container element in the HTML
-            $('#videoList').append(list);
+            // Update current video watch counter
+            setTimeout(() => {
+                updateTotalWatchCount(res);
+            }, 600);
+            // Update current queue list
+            updateCurrentQueueList(res, userId);
         },
         error: function () {
             // This function will be called if there is an error fetching the data
@@ -246,7 +267,7 @@ async function setupDashboardPage() {
         const inputText = inputField.value;
         // Only allow video IDs
         function checkId(input) {
-            const regex = /(https:|http:|www\.|\.com\/|\/watch=|youtu\.be\/|&t=)/i;
+            const regex = /(https:|http:|www\.|\.com\/|\/watch=|youtu\.be\/)/i;
             if (regex.exec(input)) {
                 return false
             } else {
@@ -259,7 +280,7 @@ async function setupDashboardPage() {
                 inputError.innerText = 'Please make sure you only enter video IDs';
                 setTimeout(() => {
                     inputError.innerText = ``;
-                }, 5000);
+                }, 7000);
             }
         } else {
             if (sendCreateBtn.classList.contains('disabled')) $(sendCreateBtn).toggleClass('disabled');
@@ -293,7 +314,7 @@ async function setupDashboardPage() {
                     inputError.innerText = `You don't have enough tokens`;
                     setTimeout(() => {
                         inputError.innerText = ``;
-                    }, 5000);
+                    }, 7000);
                     $(inputField).val('');
                     $(sendCreateBtn).toggleClass('hidden');
                     $(endCreateBtn).toggleClass('hidden');
@@ -311,7 +332,7 @@ async function setupDashboardPage() {
                                 inputError.innerText = res.error;
                                 setTimeout(() => {
                                     inputError.innerText = ``;
-                                }, 5000);
+                                }, 7000);
                                 $(inputField).val('');
                                 $(sendCreateBtn).toggleClass('hidden');
                                 $(endCreateBtn).toggleClass('hidden');
@@ -320,7 +341,7 @@ async function setupDashboardPage() {
                                 inputError.innerText = res.message;
                                 setTimeout(() => {
                                     inputError.innerText = ``;
-                                }, 5000);
+                                }, 7000);
                                 $(inputField).val('');
                                 $(sendCreateBtn).toggleClass('hidden');
                                 $(endCreateBtn).toggleClass('hidden');
@@ -331,7 +352,7 @@ async function setupDashboardPage() {
                             inputError.innerText = 'Something went wrong';
                             setTimeout(() => {
                                 inputError.innerText = ``;
-                            }, 5000);
+                            }, 7000);
                             $(inputField).val('');
                             $(sendCreateBtn).toggleClass('hidden');
                             $(endCreateBtn).toggleClass('hidden');
@@ -341,44 +362,6 @@ async function setupDashboardPage() {
             }
         });
     });
-
-    // Create a new Date object
-    const now = new Date();
-    const utcTime = now.getTime();
-    const timezoneOffset = now.getTimezoneOffset();
-    const gmtPlus11Time = utcTime + (11 * 60 * 60 * 1000) + (timezoneOffset * 60 * 1000);
-    const gmtPlus11Date = new Date(gmtPlus11Time);
-    // Create a new Date object for midnight
-    const midnight = new Date(gmtPlus11Date.getFullYear(), gmtPlus11Date.getMonth(), gmtPlus11Date.getDate());
-    midnight.setHours(24);
-    midnight.setMinutes(0);
-    midnight.setSeconds(0);
-    // Get countdown element
-    const timeToReset = document.getElementById("timeToReset");
-    // Update the time remaining every second
-    const interval = setInterval(() => {
-        // Calculate the time difference in milliseconds
-        const timeDifference = midnight.getTime() - gmtPlus11Date.getTime();
-        // Check if we've reached midnight
-        if (timeDifference <= 0) {
-            clearInterval(interval);
-            return;
-        }
-        // Convert milliseconds to hours, minutes, and seconds
-        const hours = Math.floor(timeDifference / (1000 * 60 * 60));
-        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
-        // Format the time remaining as a string
-        const timeString = `${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
-        // Display the time remaining
-        timeToReset.innerText = `Queue resets in ${timeString}`;
-        // Update the current GMT+11 time
-        const now = new Date();
-        const utcTime = now.getTime();
-        const timezoneOffset = now.getTimezoneOffset();
-        const gmtPlus11Time = utcTime + (11 * 60 * 60 * 1000) + (timezoneOffset * 60 * 1000);
-        gmtPlus11Date.setTime(gmtPlus11Time);
-    }, 1000);
 
     // Play queue button animation
     var disabled = false;

@@ -150,7 +150,6 @@ function handleAuthentication(success) {
 let preventNext;
 let monitorCheck;
 let monitorCheckTwo;
-// let activeListener;
 let statusChangeCount = 0;
 async function getQueueAndPlay(tabId, reversed) {
     let videoIds = await getVideoList();
@@ -186,7 +185,6 @@ async function getQueueAndPlay(tabId, reversed) {
                     if (chrome.runtime.lastError) return;
                     reversed ? initMonitoringTwo(tab) : initMonitoring(tab);
                     // Add a listener to check if a page is refreshed or manually navigated
-                    // if (!activeListener) listenForTabUpdates(tab);
                     // Send a message to like the video
                     sendTabMessage(tab, { sendLike: true, tabId: tab.id, videoId: videoIds[index] });
                     // Send a message to block page interactions
@@ -254,27 +252,6 @@ function initMonitoringTwo(tab) {
         });
     }, 1000);
 }
-
-// function listenForTabUpdates(tab) {
-//     function listenerFunc(tabId, changeInfo, thisTab) {
-//         if (tabId === tab.id) {
-//             if (changeInfo.status === 'loading' && (!changeInfo.url || !changeInfo.url.includes('success'))) statusChangeCount++
-//             if (statusChangeCount > 2) {
-//                 try {
-//                     preventNext = true;
-//                     chrome.storage.sync.set({ activeQueue: false });
-//                     chrome.tabs.onUpdated.removeListener(listenerFunc);
-//                     const errorMessage = 'Blocked user input was detected. Please do not try to interact with tabs in the queue window'
-//                     chrome.tabs.update(tabId, { url: `http://54.79.93.12/error?message=${errorMessage}` });
-//                 } catch (err) {
-//                     console.log('There was a problem : ', err);
-//                 }
-//             }
-//         }
-//     }
-//     chrome.tabs.onUpdated.addListener(listenerFunc);
-//     activeListener = true;
-// }
 
 function sendTabMessage(tab, message) {
     const statusCheck = setInterval(() => {
@@ -363,7 +340,11 @@ async function getVideoList() {
     const data = await response.json();
     // Check if the response has a "videoList" property
     if (data.videoList) {
-        return data.videoList;
+        let videoIdArr = [];
+        for (const item of data.videoList) {
+            videoIdArr.push(item.videoId);
+        }
+        return videoIdArr;
     } else {
         // Return null if the response has no videoList
         return null;
