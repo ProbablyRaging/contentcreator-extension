@@ -100,12 +100,15 @@ function numberWithCommas(x) {
 async function setupDashboardPage() {
     const { activeQueue } = await chrome.storage.sync.get(['activeQueue']);
     const { userId } = await chrome.storage.sync.get(['userId']);
+    const { muteQueue } = await chrome.storage.sync.get(['muteQueue']);
+    const { playFull } = await chrome.storage.sync.get(['playFull']);
 
     const dashboard = document.getElementById('dashboardFadeIn');
     $(dashboard).animate({ opacity: 1 }, 300);
 
     setTimeout(() => {
         $('.title-welcome').animate({ opacity: 1 }, 200);
+        $('.settings-btn').animate({ opacity: 1 }, 300);
     }, 470);
 
     setTimeout(() => {
@@ -116,6 +119,8 @@ async function setupDashboardPage() {
         $('.footer').animate({ opacity: 1 }, 300);
     }, 770);
 
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsMenu = document.getElementById('settingsMenu');
     const button = document.getElementById('button');
     const createBtn = document.getElementById('createBtn');
     const endCreateBtn = document.getElementById('endCreateBtn');
@@ -128,6 +133,10 @@ async function setupDashboardPage() {
     const sendCreateBtn = document.getElementById('sendCreateBtn');
     const tokenData = document.getElementById('tokenData');
     const accordian = document.getElementById('list-title');
+    const muteQueueSwitch = document.getElementById("muteQueueSwitch");
+    const muteQueueContainer = document.getElementById("muteQueueContainer");
+    const playFullSwitch = document.getElementById("playFullSwitch");
+    const playFullContainer = document.getElementById("playFullContainer");
 
     // If there is already an active queue window, disable the play queue button
     if (activeQueue) {
@@ -136,19 +145,32 @@ async function setupDashboardPage() {
         button.classList.remove('ready');
     }
 
-    // On page load, get the mute queue storage value and update the checkbox value
-    // When the mute queue checkbox is clicked, update storage value
-    const muteQueueBox = document.getElementById("muteQueueBox");
-    const { muteQueue } = await chrome.storage.sync.get(['muteQueue']);
-    if (muteQueue) muteQueueBox.checked = true;
-    if (!muteQueue) muteQueueBox.checked = false;
-    muteQueueBox.addEventListener("change", (event) => {
-        if (event.target.checked) {
-            chrome.storage.sync.set({ muteQueue: true });
-        } else {
-            chrome.storage.sync.set({ muteQueue: false });
-        }
+    // Settings switches
+    muteQueue ? muteQueueSwitch.classList.add('toggled') : muteQueueSwitch.classList.remove('toggled');
+    muteQueueContainer.addEventListener('click', function () {
+        chrome.storage.sync.get(['muteQueue'], async result => {
+            if (result.muteQueue) {
+                muteQueueSwitch.classList.remove('toggled');
+                await chrome.storage.sync.set({ muteQueue: false });
+            } else {
+                muteQueueSwitch.classList.add('toggled');
+                await chrome.storage.sync.set({ muteQueue: true });
+            }
+        });
     });
+    playFull ? playFullSwitch.classList.add('toggled') : playFullSwitch.classList.remove('toggled');
+    playFullContainer.addEventListener('click', function () {
+        chrome.storage.sync.get(['playFull'], async result => {
+            if (result.playFull) {
+                playFullSwitch.classList.remove('toggled');
+                await chrome.storage.sync.set({ playFull: false });
+            } else {
+                playFullSwitch.classList.add('toggled');
+                await chrome.storage.sync.set({ playFull: true });
+            }
+        });
+    });
+
 
     // Fetch video list, update count, and update current queue list
     $.ajax({
@@ -172,21 +194,50 @@ async function setupDashboardPage() {
     accordian.addEventListener('click', function () {
         const openElements = document.querySelectorAll('.slidDown');
         openElements.forEach(openElement => {
-            $('body').animate({ 'paddingBottom': '0px' }, 200);
             const caret = openElement.querySelector('i');
-            $(caret).animate({ "rotate": "0deg" }, 200);
+            $(caret).animate({ 'rotate': "0deg" }, 200);
             $(openElement.nextElementSibling).slideUp(200);
             $(openElement).toggleClass('slidDown');
         });
 
         $(this).parent().parent().find('ul').slideUp(150);
         if (!$(this).next().is(":visible")) {
-            $('body').animate({ 'paddingBottom': '170px' }, 200);
             const caret = this.querySelector('i');
-            $(caret).animate({ "rotate": "180deg" }, 200);
+            $(caret).animate({ 'rotate': "180deg" }, 200);
             $(this).next().slideDown(0);
             $(this).toggleClass('slidDown');
             $('.hidden-list').slideDown(150);
+        }
+    });
+
+    // When the settings button is clicked
+    settingsBtn.addEventListener('click', function () {
+        if (!settingsMenu.classList.contains('shown')) {
+            $(dashboard).find(settingsBtn).siblings().not(settingsBtn).css('filter', 'blur(2px)');
+            const bodyBlur = document.createElement("div");
+            bodyBlur.id = 'bodyBlur';
+            bodyBlur.style.position = 'absolute';
+            bodyBlur.style.top = '0';
+            bodyBlur.style.left = '0';
+            bodyBlur.style.width = '100%';
+            bodyBlur.style.height = '100%';
+            bodyBlur.style.backgroundColor = '#00000029';
+            bodyBlur.style.backdropFilter = 'blur(3px)';
+            document.body.insertBefore(bodyBlur, document.body.firstChild);
+            $(settingsBtn).css('background-color', '#0000005f')
+                .animate({ 'rotate': '180deg' }, 250)
+                .removeClass('bi-gear-fill')
+                .addClass('bi-x-lg');
+            $(settingsMenu).animate({ top: '70' }, 250).toggleClass('shown')
+        } else {
+            $(dashboard).find(settingsBtn).siblings().not(settingsBtn).css('filter', 'blur(0px)');
+            document.querySelector('#bodyBlur').remove();
+            $(settingsBtn).css('background-color', '#00000040')
+                .animate({ 'rotate': '0deg' }, 250).promise().then(() => {
+                    $(settingsBtn).addClass('bi-gear-fill')
+                        .removeClass('bi-x-lg');
+                });
+            $(settingsMenu).animate({ top: '568' }, 250).toggleClass('shown')
         }
     });
 
@@ -215,18 +266,19 @@ async function setupDashboardPage() {
         inputError.innerText = '';
     });
     // When the refresh button is clicked, redirect to the loader.html page
-    refreshBtn.addEventListener('click', function () {
-        $('.title-welcome').animate({ opacity: 0 }, 200);
-        setTimeout(() => {
-            $('.body-bg').animate({ 'background-position-y': '-90px' }, 300);
-            $('body').animate({ opacity: 0 }, 300).promise().then(() => {
-                window.location = '../views/loader.html';
-            });
-        }, 200);
-    });
+    // refreshBtn.addEventListener('click', function () {
+    //     $('.title-welcome').animate({ opacity: 0 }, 200);
+    //     setTimeout(() => {
+    //         $('.body-bg').animate({ 'background-position-y': '-90px' }, 300);
+    //         $('body').animate({ opacity: 0 }, 300).promise().then(() => {
+    //             window.location = '../views/loader.html';
+    //         });
+    //     }, 200);
+    // });
     // When the refresh button is clicked, redirect to the loader.html page
     statsBtn.addEventListener('click', function () {
         $('.title-welcome').animate({ opacity: 0 }, 200);
+        $('.settings-btn').animate({ opacity: 0 }, 200);
         setTimeout(() => {
             $('.body-bg').animate({ 'background-position-y': '-90px' }, 300);
             $('body').animate({ opacity: 0 }, 300).promise().then(() => {

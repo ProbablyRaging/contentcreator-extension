@@ -275,8 +275,9 @@ async function getVideoDuration(tab) {
                 if (chrome.runtime.lastError) return;
                 // Check if the tab has finished loading
                 if (tab.status === 'complete') {
+                    const { playFull } = await chrome.storage.sync.get(['playFull']);
                     // Send a message to the content script to get the video duration
-                    await chrome.tabs.sendMessage(tab.id, { getDuration: true }, function (response) {
+                    await chrome.tabs.sendMessage(tab.id, { getDuration: true, playFull }, function (response) {
                         if (chrome.runtime.lastError) return;
                         // Once a response is received, clear the status check interval and resolve the Promise with the response
                         clearInterval(statusCheck);

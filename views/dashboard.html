@@ -4,6 +4,8 @@
             <p class="title-welcome">Welcome, data.result.username</p>
         </div>
 
+        <i id="settingsBtn" class="bi bi-gear-fill settings-btn"></i>
+
         <p id="timeToReset" class="container-body queue-countdown">You don't have a video in the queue</p>
 
         <div class="play-button">
@@ -33,11 +35,6 @@
         </div>
 
         <div class="content-container">
-            <label class="checkbox-wrapper">
-                <input id="muteQueueBox" type="checkbox" name="muteQueueBox" value="1">
-                Mute queue window
-            </label>
-
             <p id="watchCount" class="container-body-lg">video views today</p>
         </div>
 
@@ -52,13 +49,13 @@
         <div class="footer">
             <p id="input-error" class="input-error"></p>
             <input id="createInput" type="text" placeholder="Enter video ID"></input>
-            <div id="logoutBtn" class="footer-btn logout">
+            <div id="logoutBtn" class="footer-btn logout" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Logout">
                 <i class="bi bi-arrow-return-left"></i>
             </div>
-            <div id="createBtn" class="footer-btn" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Submit new video">
+            <div id="createBtn" class="footer-btn" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Submit Video">
                 <i class="bi bi-plus-lg"></i>
             </div>
-            <div id="statsBtn" class="footer-btn" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="View your stats">
+            <div id="statsBtn" class="footer-btn" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Statistics">
                 <i class="bi bi-bar-chart"></i>
             </div>
             <div id="sendCreateBtn" class="footer-btn hidden">
@@ -66,9 +63,6 @@
             </div>
             <div id="endCreateBtn" class="footer-btn hidden">
                 <i class="bi bi-x-lg"></i>
-            </div>
-            <div id="refreshBtn" class="footer-btn" data-bs-toggle="tooltip" data-bs-title="Refresh to update token count">
-                <i class="bi bi-arrow-clockwise"></i>
             </div>
 
             <div id="currencyBlob" class="currency">
@@ -78,4 +72,23 @@
             </div>
         </div>
     </div>
+    <div id="settingsMenu" class="settings-menu">
+        <div class="settings-container">
+            <div class="settings-div">
+                <div class="settings-wrapper">
+                    <div class="switch-wrapper">
+                        <p class="switch-label">Mute Queue Window <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Plays videos with no sound"></i></p>
+                        <div id="muteQueueContainer" class="toggle-container">
+                            <button id="muteQueueSwitch" class="toggle-button"></button>
+                        </div>
+                    </div>
+                    <div class="switch-wrapper">
+                        <p class="switch-label">Play Full Video <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Play videos for the full length"></i></p>
+                        <div id="playFullContainer" class="toggle-container">
+                            <button id="playFullSwitch" class="toggle-button"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 </body>

@@ -5,7 +5,7 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
     }
     // Get the duration of the video
     if (message.getDuration) {
-        sendResponse(getVideoDuration());
+        sendResponse(getVideoDuration(message.playFull));
     }
     // Block tab interaction
     if (message.blockTab) {
@@ -33,7 +33,7 @@ function findAndClickLikeButton(tabId, videoId) {
 }
 
 let retries = 0;
-function getVideoDuration() {
+function getVideoDuration(playFull) {
     // Fallback if we can't find a duration
     if (retries >= 3) {
         retries = 0;
@@ -45,6 +45,8 @@ function getVideoDuration() {
         const minutes = parseInt(minutesStr, 10);
         const seconds = parseInt(secondsStr, 10);
         const durationMs = (minutes * 60 + seconds) * 1000;
+        // If the play full video option is enabled
+        if (playFull) return durationMs;
         // Limit the duration to 10 minutes
         const returnedDuration = durationMs > 600000 ? 600000 : durationMs;
         return returnedDuration;
