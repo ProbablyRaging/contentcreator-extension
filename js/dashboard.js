@@ -173,7 +173,6 @@ async function setupDashboardPage() {
         });
     });
 
-
     // Fetch video list, update count, and update current queue list
     $.ajax({
         url: 'http://54.79.93.12/api/videolist', // replace with your own URL

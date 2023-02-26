@@ -214,47 +214,114 @@ async function getQueueAndPlay(tabId, reversed) {
     openTab();
 }
 
-// Sets up monitoring of the specified tab
+// Sets up monitoring of the specified tab in the specified window
 function initMonitoring(tab) {
-    // Check the status of the tab every second
-    monitorCheck = setInterval(() => {
-        // If the user closes the tab early, stop monitoring
-        chrome.tabs.get(tab.id, function (tab) {
-            if (chrome.runtime.lastError) {
-                chrome.windows.remove(initWindowId);
-                clearInterval(monitorCheck);
-                clearInterval(monitorCheckTwo);
-                return;
-            }
-        });
-    }, 1000);
+    // Check if the window still exists
+    chrome.windows.get(initWindowId, { populate: false }, function (window) {
+        if (chrome.runtime.lastError || !window) {
+            // Window doesn't exist, stop monitoring
+            clearInterval(monitorCheck);
+            clearInterval(monitorCheckTwo);
+            return;
+        }
+        // Check the status of the tab every second
+        monitorCheck = setInterval(() => {
+            chrome.windows.get(initWindowId, { populate: false }, function (window) {
+                if (chrome.runtime.lastError || !window) {
+                    // Window doesn't exist, stop monitoring
+                    clearInterval(monitorCheck);
+                    clearInterval(monitorCheckTwo);
+                    return;
+                }
+                // If the user closes the tab early, stop monitoring
+                chrome.tabs.query({ windowId: initWindowId }, function (tabs) {
+                    if (tabs.length > 0) {
+                        chrome.tabs.get(tab.id, function (tab) {
+                            if (chrome.runtime.lastError) {
+                                chrome.windows.remove(initWindowId);
+                                clearInterval(monitorCheck);
+                                clearInterval(monitorCheckTwo);
+                                return;
+                            }
+                        });
+                    } else {
+                        chrome.windows.remove(initWindowId);
+                        clearInterval(monitorCheck);
+                        clearInterval(monitorCheckTwo);
+                        return;
+                    }
+                });
+            });
+        }, 1000);
+    });
 }
 
 function initMonitoringTwo(tab) {
-    // Check the status of the tab every second
-    monitorCheckTwo = setInterval(() => {
-        // If the user closes the tab early, stop monitoring
-        chrome.tabs.get(tab.id, function (tab) {
-            if (chrome.runtime.lastError) {
-                chrome.windows.remove(initWindowId);
-                clearInterval(initMonitoring);
-                clearInterval(initMonitoringTwo);
-                return;
-            }
-        });
-    }, 1000);
+    // Check if the window still exists
+    chrome.windows.get(initWindowId, { populate: false }, function (window) {
+        if (chrome.runtime.lastError || !window) {
+            // Window doesn't exist, stop monitoring
+            clearInterval(monitorCheck);
+            clearInterval(monitorCheckTwo);
+            return;
+        }
+        // Check the status of the tab every second
+        monitorCheckTwo = setInterval(() => {
+            chrome.windows.get(initWindowId, { populate: false }, function (window) {
+                if (chrome.runtime.lastError || !window) {
+                    // Window doesn't exist, stop monitoring
+                    clearInterval(monitorCheck);
+                    clearInterval(monitorCheckTwo);
+                    return;
+                }
+                // If the user closes the tab early, stop monitoring
+                chrome.tabs.query({ windowId: initWindowId }, function (tabs) {
+                    if (tabs.length > 0) {
+                        chrome.tabs.get(tab.id, function (tab) {
+                            if (chrome.runtime.lastError) {
+                                chrome.windows.remove(initWindowId);
+                                clearInterval(monitorCheck);
+                                clearInterval(monitorCheckTwo);
+                                return;
+                            }
+                        });
+                    } else {
+                        chrome.windows.remove(initWindowId);
+                        clearInterval(monitorCheck);
+                        clearInterval(monitorCheckTwo);
+                        return;
+                    }
+                });
+            });
+        }, 1000);
+    });
 }
 
 function sendTabMessage(tab, message) {
-    const statusCheck = setInterval(() => {
-        chrome.tabs.get(tab.id, function (tab) {
-            if (chrome.runtime.lastError) return;
-            if (tab.status === 'complete') {
-                chrome.tabs.sendMessage(tab.id, message);
-                clearInterval(statusCheck);
-            }
-        });
-    }, 1000);
+    // Check if the window still exists
+    chrome.windows.get(initWindowId, { populate: false }, function (window) {
+        if (chrome.runtime.lastError || !window) return;
+        // Check the status of the tab every second
+        const statusCheck = setInterval(() => {
+            chrome.windows.get(initWindowId, { populate: false }, function (window) {
+                if (chrome.runtime.lastError || !window) return;
+                // If the user closes the tab early, stop monitoring
+                chrome.tabs.query({ windowId: initWindowId }, function (tabs) {
+                    if (tabs.length > 0) {
+                        chrome.tabs.get(tab.id, function (tab) {
+                            if (chrome.runtime.lastError) return;
+                            if (tab.status === 'complete') {
+                                chrome.tabs.sendMessage(tab.id, message);
+                                clearInterval(statusCheck);
+                            }
+                        });
+                    } else {
+                        return;
+                    }
+                });
+            });
+        }, 1000);
+    });
 }
 
 async function getVideoDuration(tab) {
