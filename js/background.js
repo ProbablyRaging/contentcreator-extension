@@ -1,7 +1,3 @@
-chrome.runtime.onInstalled.addListener((details) => {
-    if (details.reason === 'update') chrome.storage.sync.set({ activeQueue: false });
-});
-
 let initWindowId;
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Login attempt
@@ -29,6 +25,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             width: 600,
             height: 800,
         }, async function (window) {
+            chrome.storage.sync.set({ activeWindowId: window.id });
             initWindowId = window.id;
             // Check browser name
             const delaySecondTab = navigator.userAgent.includes('Chrome') ? 15000 : 7000;
@@ -206,7 +203,6 @@ async function getQueueAndPlay(tabId, reversed) {
         } else {
             // If no more videos are available, navigate to the queue finished page
             try {
-                chrome.storage.sync.set({ activeQueue: false });
                 clearInterval(monitorCheck);
                 const successMessage = 'You have reached the end of the queue';
                 chrome.tabs.update(tabId, { url: `http://54.79.93.12/success?message=${successMessage}` });
@@ -220,13 +216,11 @@ async function getQueueAndPlay(tabId, reversed) {
 
 // Sets up monitoring of the specified tab
 function initMonitoring(tab) {
-    chrome.storage.sync.set({ activeQueue: true });
     // Check the status of the tab every second
     monitorCheck = setInterval(() => {
         // If the user closes the tab early, stop monitoring
         chrome.tabs.get(tab.id, function (tab) {
             if (chrome.runtime.lastError) {
-                chrome.storage.sync.set({ activeQueue: false });
                 chrome.windows.remove(initWindowId);
                 clearInterval(monitorCheck);
                 clearInterval(monitorCheckTwo);
@@ -237,13 +231,11 @@ function initMonitoring(tab) {
 }
 
 function initMonitoringTwo(tab) {
-    chrome.storage.sync.set({ activeQueue: true });
     // Check the status of the tab every second
     monitorCheckTwo = setInterval(() => {
         // If the user closes the tab early, stop monitoring
         chrome.tabs.get(tab.id, function (tab) {
             if (chrome.runtime.lastError) {
-                chrome.storage.sync.set({ activeQueue: false });
                 chrome.windows.remove(initWindowId);
                 clearInterval(initMonitoring);
                 clearInterval(initMonitoringTwo);

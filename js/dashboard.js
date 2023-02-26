@@ -98,7 +98,7 @@ function numberWithCommas(x) {
 }
 
 async function setupDashboardPage() {
-    const { activeQueue } = await chrome.storage.sync.get(['activeQueue']);
+    const { activeWindowId } = await chrome.storage.sync.get(['activeWindowId']);
     const { userId } = await chrome.storage.sync.get(['userId']);
     const { muteQueue } = await chrome.storage.sync.get(['muteQueue']);
     const { playFull } = await chrome.storage.sync.get(['playFull']);
@@ -138,10 +138,13 @@ async function setupDashboardPage() {
     const playFullContainer = document.getElementById("playFullContainer");
 
     // If there is already an active queue window, disable the play queue button
-    if (activeQueue) {
-        button.disabled = true;
-        button.classList.add('complete');
-        button.classList.remove('ready');
+    if (activeWindowId) {
+        chrome.windows.get(activeWindowId, function (window) {
+            if (chrome.runtime.lastError) return;
+            button.disabled = true;
+            button.classList.add('complete');
+            button.classList.remove('ready');
+        });
     }
 
     // Settings switches
