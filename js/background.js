@@ -1,3 +1,6 @@
+/**
+ * Receiving messages from main.js and popup.js
+ */
 let initWindowId;
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Login attempt
@@ -25,84 +28,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             width: 600,
             height: 800,
         }, async function (window) {
+            // Store the queue window ID for checking later
             chrome.storage.sync.set({ activeWindowId: window.id });
             initWindowId = window.id;
-            // Check browser name
+            // Check browser type and determine delay
             const delaySecondTab = navigator.userAgent.includes('Chrome') ? 15000 : 7000;
             // Stop executing if the window is closed
             if (chrome.runtime.lastError) return;
-            try {
-                // Mute the tab
-                const tabs = window.tabs;
-                if (tabs && tabs.length > 0 && tabs[0].id) {
-                    const { muteQueue } = await chrome.storage.sync.get({ muteQueue: false });
-                    chrome.tabs.update(tabs[0].id, { muted: muteQueue }, function (tab) {
-                        if (chrome.runtime.lastError) return;
-                        if (tab && tab.id) {
-                            setTimeout(() => {
-                                getQueueAndPlay(tab.id, false);
-                            }, 3000);
-                        } else {
-                            console.error('No tab found in the window');
-                        }
-                    });
-                    setTimeout(() => {
-                        const successMessage = 'Loading reversed queue..';
-                        chrome.tabs.create({
-                            url: `http://54.79.93.12/success?message=${successMessage}`,
-                            windowId: window.id
-                        }, async function (tab) {
-                            if (chrome.runtime.lastError) return;
-                            chrome.tabs.update(tab.id, { muted: muteQueue }, function () {
-                                if (chrome.runtime.lastError) return;
-                                if (tab && tab.id) {
-                                    setTimeout(() => {
-                                        getQueueAndPlay(tab.id, true);
-                                    }, 3000);
-                                } else {
-                                    console.error('No tab found in the window');
-                                }
-                            });
-                        });
-                    }, delaySecondTab);
-                } else {
-                    console.error('No tab found in the window');
-                }
-            } catch (err) {
-                console.error('There was a problem: ', err);
-            }
-        });
-    }
-    // If the user isn't signed in to youtube
-    if (message.signedIn === false) {
-        if (initWindowId) chrome.windows.remove(initWindowId);
-        const errorMessage = 'You must sign in to YouTube to use this app'
-        chrome.windows.create({
-            url: `http://54.79.93.12/error?message=${errorMessage}`,
-            focused: true,
-            type: 'panel',
-            width: 600,
-            height: 800
+            createQueueWindow(window, delaySecondTab);
         });
     }
     // If the like but was clicked successfully
     if (message.videoLiked) {
         incrementLikeCount(message.tabId, message.videoId);
     }
+    // If the user isn't signed in to youtube
+    if (message.signedIn === false) {
+        const errorMessage = 'You must sign in to YouTube to use this app';
+        if (initWindowId) createErrorWindow(initWindowId, errorMessage);
+    }
     // If chrome user doesn't interact with window in time
     if (message.noResponse) {
-        if (initWindowId) chrome.windows.remove(initWindowId);
-        const errorMessage = 'You did not interact with the window in time'
-        chrome.windows.create({
-            url: `http://54.79.93.12/error?message=${errorMessage}`,
-            focused: true,
-            type: 'panel',
-            width: 600,
-            height: 800
-        });
+        const errorMessage = 'You did not interact with the window in time';
+        if (initWindowId) createErrorWindow(initWindowId, errorMessage);
     }
 });
 
+/**
+ * Handling user authentication
+ */
 function checkAuthState(window) {
     chrome.tabs.get(window.tabs[0].id, function (tab) {
         if (chrome.runtime.lastError) {
@@ -142,6 +96,57 @@ function handleAuthentication(success) {
     chrome.runtime.sendMessage({ success }, () => {
         if (chrome.runtime.lastError) return;
     });
+}
+
+/**
+ * Handling playing queue
+ */
+async function createQueueWindow(window, delaySecondTab) {
+    try {
+        const tabs = window.tabs;
+        // Make sure the initial tab was created
+        if (tabs && tabs.length > 0 && tabs[0].id) {
+            // Check if we need to mute the tab or not
+            const { muteQueue } = await chrome.storage.sync.get({ muteQueue: false });
+            chrome.tabs.update(tabs[0].id, { muted: muteQueue }, function (tab) {
+                if (chrome.runtime.lastError) return;
+                if (tab && tab.id) {
+                    // Wait and start playing the queue
+                    setTimeout(() => {
+                        getQueueAndPlay(tab.id, false);
+                    }, 3000);
+                } else {
+                    console.log('No tab found in the window');
+                }
+            });
+            // Wait before creating a secondary tab for reversed queue
+            setTimeout(() => {
+                const successMessage = 'Loading reversed queue..';
+                chrome.tabs.create({
+                    url: `http://54.79.93.12/success?message=${successMessage}`,
+                    windowId: window.id
+                }, async function (tab) {
+                    if (chrome.runtime.lastError) return;
+                    // Create the secondary tab
+                    chrome.tabs.update(tab.id, { muted: muteQueue }, function () {
+                        if (chrome.runtime.lastError) return;
+                        if (tab && tab.id) {
+                            // Wait and start playing the queue
+                            setTimeout(() => {
+                                getQueueAndPlay(tab.id, true);
+                            }, 3000);
+                        } else {
+                            console.log('No tab found in the window');
+                        }
+                    });
+                });
+            }, delaySecondTab);
+        } else {
+            console.log('No tab found in the window');
+        }
+    } catch (err) {
+        console.log('There was a problem: ', err);
+    }
 }
 
 let preventNext;
@@ -409,4 +414,15 @@ async function getVideoList() {
         // Return null if the response has no videoList
         return null;
     }
+}
+
+function createErrorWindow(initWindowId, errorMessage) {
+    chrome.windows.remove(initWindowId)
+    chrome.windows.create({
+        url: `http://54.79.93.12/error?message=${errorMessage}`,
+        focused: true,
+        type: 'panel',
+        width: 600,
+        height: 800
+    });
 }
