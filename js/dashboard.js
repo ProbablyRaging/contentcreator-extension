@@ -124,7 +124,6 @@ async function setupDashboardPage() {
     const button = document.getElementById('button');
     const createBtn = document.getElementById('createBtn');
     const endCreateBtn = document.getElementById('endCreateBtn');
-    const refreshBtn = document.getElementById('refreshBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const statsBtn = document.getElementById('statsBtn');
     const createInput = document.getElementById('createInput');
@@ -223,8 +222,22 @@ async function setupDashboardPage() {
             bodyBlur.style.height = '100%';
             bodyBlur.style.backgroundColor = '#00000029';
             bodyBlur.style.backdropFilter = 'blur(3px)';
+            bodyBlur.style.zIndex = '2';
+            // Aloow the settings menu to be closed by clicking outside of it
+            bodyBlur.onclick = function () {
+                $(dashboard).find(settingsBtn).siblings().not(settingsBtn).css('filter', 'blur(0px)');
+                document.querySelector('#bodyBlur').remove();
+                $(settingsBtn).css('background-color', '#00000040')
+                    .css('z-index', '0')
+                    .animate({ 'rotate': '0deg' }, 250).promise().then(() => {
+                        $(settingsBtn).addClass('bi-gear-fill')
+                            .removeClass('bi-x-lg');
+                    });
+                $(settingsMenu).animate({ top: '568' }, 250).toggleClass('shown');
+            }
             document.body.insertBefore(bodyBlur, document.body.firstChild);
             $(settingsBtn).css('background-color', '#0000005f')
+                .css('z-index', '999')
                 .animate({ 'rotate': '180deg' }, 250)
                 .removeClass('bi-gear-fill')
                 .addClass('bi-x-lg');
@@ -233,48 +246,43 @@ async function setupDashboardPage() {
             $(dashboard).find(settingsBtn).siblings().not(settingsBtn).css('filter', 'blur(0px)');
             document.querySelector('#bodyBlur').remove();
             $(settingsBtn).css('background-color', '#00000040')
+                .css('z-index', '0')
                 .animate({ 'rotate': '0deg' }, 250).promise().then(() => {
                     $(settingsBtn).addClass('bi-gear-fill')
                         .removeClass('bi-x-lg');
                 });
-            $(settingsMenu).animate({ top: '568' }, 250).toggleClass('shown')
+            $(settingsMenu).animate({ top: '568' }, 250).toggleClass('shown');
         }
     });
 
     // When the create button is clicked, toggle its class and that
     // of the end create button, show the input and the input error message
     createBtn.addEventListener('click', function () {
-        $(this).toggleClass('hidden');
-        $(endCreateBtn).toggleClass('hidden');
-        $(createInput).show(150);
-        $(inputError).show(150);
-        $(inputField).focus();
-        $(refreshBtn).hide(150);
-        $(logoutBtn).hide(150);
-        $(statsBtn).hide(150);
+        try {
+            $(this).hide(150).toggleClass('hidden');
+            $(endCreateBtn).css({ display: 'flex' });
+            $(logoutBtn).hide(150);
+            $(createInput).show(150);
+            $(inputField).focus();
+            $(statsBtn).hide(150);
+        } catch (err) {
+            console.log('There was a problem : ', err);
+        }
     });
     // When the end create button is clicked, toggle its class and that of the create button,
     // hide the input and the input error message, and clear the input error message text
     endCreateBtn.addEventListener('click', function () {
-        $(this).toggleClass('hidden');
-        $(createBtn).toggleClass('hidden');
-        $(createInput).hide(150);
-        $(inputError).hide(150);
-        $(refreshBtn).show(150);
-        $(logoutBtn).show(150);
-        $(statsBtn).show(150);
-        inputError.innerText = '';
+        try {
+            $(this).hide(0).toggleClass('hidden');
+            $(createBtn).css({ display: 'flex' });
+            $(createInput).hide(150);
+            $(logoutBtn).show(150);
+            $(statsBtn).show(150);
+            inputError.innerText = '';
+        } catch (err) {
+            console.log('There was a problem : ', err);
+        }
     });
-    // When the refresh button is clicked, redirect to the loader.html page
-    // refreshBtn.addEventListener('click', function () {
-    //     $('.title-welcome').animate({ opacity: 0 }, 200);
-    //     setTimeout(() => {
-    //         $('.body-bg').animate({ 'background-position-y': '-90px' }, 300);
-    //         $('body').animate({ opacity: 0 }, 300).promise().then(() => {
-    //             window.location = '../views/loader.html';
-    //         });
-    //     }, 200);
-    // });
     // When the refresh button is clicked, redirect to the loader.html page
     statsBtn.addEventListener('click', function () {
         $('.title-welcome').animate({ opacity: 0 }, 200);
@@ -342,11 +350,11 @@ async function setupDashboardPage() {
         if (inputText.length > 0) {
             if (!sendCreateBtn.classList.contains('hidden')) return;
             // Disable the submit button if not valid input
-            $(sendCreateBtn).toggleClass('hidden');
-            $(endCreateBtn).toggleClass('hidden');
+            $(sendCreateBtn).css({ display: 'flex' }).toggleClass('hidden');
+            $(endCreateBtn).hide(0);
         } else {
-            $(sendCreateBtn).toggleClass('hidden');
-            $(endCreateBtn).toggleClass('hidden');
+            $(sendCreateBtn).hide(0).toggleClass('hidden');
+            $(endCreateBtn).css({ display: 'flex' });
         }
     });
 
@@ -386,8 +394,8 @@ async function setupDashboardPage() {
                                     inputError.innerText = ``;
                                 }, 7000);
                                 $(inputField).val('');
-                                $(sendCreateBtn).toggleClass('hidden');
-                                $(endCreateBtn).toggleClass('hidden');
+                                $(sendCreateBtn).hide(0).toggleClass('hidden');
+                                $(endCreateBtn).css({ display: 'flex' });
                             } else if (res.message) {
                                 inputError.style.color = '#58a75a';
                                 inputError.innerText = res.message;
@@ -395,8 +403,8 @@ async function setupDashboardPage() {
                                     inputError.innerText = ``;
                                 }, 7000);
                                 $(inputField).val('');
-                                $(sendCreateBtn).toggleClass('hidden');
-                                $(endCreateBtn).toggleClass('hidden');
+                                $(sendCreateBtn).hide(0).toggleClass('hidden');
+                                $(endCreateBtn).css({ display: 'flex' });
                                 tokenData.innerHTML = parseInt(tokenData.innerHTML) - 5;
                             }
                         },
@@ -406,8 +414,8 @@ async function setupDashboardPage() {
                                 inputError.innerText = ``;
                             }, 7000);
                             $(inputField).val('');
-                            $(sendCreateBtn).toggleClass('hidden');
-                            $(endCreateBtn).toggleClass('hidden');
+                            $(sendCreateBtn).hide(0).toggleClass('hidden');
+                            $(endCreateBtn).css({ display: 'flex' });
                         }
                     });
                 }

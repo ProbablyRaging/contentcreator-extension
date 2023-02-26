@@ -31,7 +31,7 @@
 }
 
 .settings-btn:hover {
-    background-color: #0000005f;
+    background-color: #0000005f !important;
 }
 
 .queue-countdown {
@@ -84,6 +84,14 @@
     bottom: 25;
     font-size: 11px;
     color: #ff7979;
+}
+
+#sendCreateBtn {
+    display: none;
+}
+
+#endCreateBtn {
+    display: none;
 }
 
 .footer-btn {
@@ -165,6 +173,10 @@
     height: fit-content;
     margin-right: 6px;
     user-select: none;
+}
+
+.tokens-data {
+    cursor: default;
 }
 
 .footer {
@@ -454,7 +466,7 @@ button.complete .successMessage svg {
     border-top: none;
     padding: 6px 0;
     font-size: 14px;
-    margin-bottom: 50px;
+    margin-bottom: 64px;
 }
 
 #accordian .hidden-list {
@@ -505,6 +517,9 @@ button.complete .successMessage svg {
     height: 100%;
     margin: 33px 0;
     box-shadow: 0 -3px 20px #00000082;
+    border-top: 4px solid rgb(1 20 32);
+    border-radius: 16px;
+    z-index: 999;
 }
 
 .settings-container {

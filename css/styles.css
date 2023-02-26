@@ -21,7 +21,7 @@
 }
 
 ::selection {
-    background-color: rgba(39, 197, 255, 0.387);
+    background-color: rgb(29, 159, 207);
 }
 
 html {
@@ -39,7 +39,6 @@ body {
     background-color: #001220 !important;
     margin: 0 !important;
     font-size: 12px !important;
-    user-select: none;
     width: 360px;
     height: 364px;
     -webkit-font-smoothing: antialiased;
@@ -96,8 +95,12 @@ p {
     }
 }
 
+.tooltip {
+    font-size: 11px;
+}
+
 .hidden {
-    display: none !important;
+    display: unset;
 }
 
 .disabled {
