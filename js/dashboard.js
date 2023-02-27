@@ -345,31 +345,8 @@ async function setupDashboardPage() {
 
     // When the text input state changes
     inputField.addEventListener("input", function () {
-        // Get the value of the input field
-        const inputText = inputField.value;
-        // Only allow video IDs
-        function checkId(input) {
-            const regex = /(https:|http:|www\.|\.com\/|\/watch=|youtu\.be\/)/i;
-            if (regex.exec(input)) {
-                return false
-            } else {
-                return true
-            }
-        }
-        if (checkId(inputText) === false) {
-            if (!sendCreateBtn.classList.contains('disabled')) {
-                $(sendCreateBtn).toggleClass('disabled');
-                inputError.innerText = 'Please make sure you only enter video IDs';
-                setTimeout(() => {
-                    inputError.innerText = ``;
-                }, 7000);
-            }
-        } else {
-            if (sendCreateBtn.classList.contains('disabled')) $(sendCreateBtn).toggleClass('disabled');
-            inputError.innerText = '';
-        }
-        // Check if the input field is empty
-        if (inputText.length > 0) {
+        // Check if the input field is empty or not
+        if (inputField.value.length > 0) {
             if (!sendCreateBtn.classList.contains('hidden')) return;
             // Disable the submit button if not valid input
             $(sendCreateBtn).css({ display: 'flex' }).toggleClass('hidden');
@@ -410,18 +387,9 @@ async function setupDashboardPage() {
                             userId: userId
                         },
                         success: function (res) {
-                            if (res.error) {
-                                inputError.innerText = res.error;
-                                setTimeout(() => {
-                                    inputError.innerText = ``;
-                                }, 7000);
-                                $(inputField).val('');
-                                $(sendCreateBtn).hide(0).toggleClass('hidden');
-                                $(endCreateBtn).css({ display: 'flex' });
-                            } else if (res.message) {
+                            if (res.message) {
                                 const oneDay = 24 * 60 * 60 * 1000;
                                 chrome.storage.sync.set({ expireTime: new Date().valueOf() + oneDay });
-                                // fetchDataAndPopulatePage();
                                 inputError.style.color = '#58a75a';
                                 inputError.innerText = res.message;
                                 setTimeout(() => {
@@ -431,6 +399,15 @@ async function setupDashboardPage() {
                                 $(sendCreateBtn).hide(0).toggleClass('hidden');
                                 $(endCreateBtn).css({ display: 'flex' });
                                 tokenData.innerHTML = parseInt(tokenData.innerHTML) - 5;
+                            } else if (res.error) {
+                                inputError.style.color = '#d96c6e';
+                                inputError.innerText = res.error;
+                                setTimeout(() => {
+                                    inputError.innerText = ``;
+                                }, 7000);
+                                $(inputField).val('');
+                                $(sendCreateBtn).hide(0).toggleClass('hidden');
+                                $(endCreateBtn).css({ display: 'flex' });
                             }
                         },
                         error: function (err) {
