@@ -1,3 +1,27 @@
+chrome.runtime.onInstalled.addListener((details) => {
+    if (details.reason === 'install') {
+        chrome.storage.sync.set({ notifications: true });
+        chrome.storage.sync.set({ muteQueue: true });
+    }
+});
+
+setInterval(async () => {
+    const { notifications } = await chrome.storage.sync.get(['notifications']);
+    const { expireTime } = await chrome.storage.sync.get(['expireTime']);
+    const { notificationSent } = await chrome.storage.sync.get(['notificationSent']);
+    if (notifications && expireTime && new Date().valueOf() > expireTime) {
+        if (!notificationSent) chrome.notifications.create({
+            type: 'basic',
+            iconUrl: '/assets/icons/icon128.png',
+            title: 'ForTheContent',
+            message: 'You are eligible to submit a new video',
+        });
+        await chrome.storage.sync.set({ notificationSent: true });
+    } else {
+        await chrome.storage.sync.set({ notificationSent: false });
+    }
+}, 10 * 60 * 1000);
+
 /**
  * Receiving messages from main.js and popup.js
  */

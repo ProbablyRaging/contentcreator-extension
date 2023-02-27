@@ -24,7 +24,28 @@ function checkDashboardPage() {
     reCheck();
 }
 
+function fetchDataAndPopulatePage(userId) {
+    chrome.storage.sync.set({ expireTime: null });
+    $.ajax({
+        url: 'http://54.79.93.12/api/videolist',
+        type: 'GET',
+        success: function (res) {
+            // Update current video watch counter
+            setTimeout(() => {
+                updateTotalWatchCount(res);
+            }, 600);
+            // Update current queue list
+            updateCurrentQueueList(res, userId);
+        },
+        error: function () {
+            // This function will be called if there is an error fetching the data
+            console.log('Error fetching data.');
+        }
+    });
+}
+
 function startVideoExpireTimer(expires) {
+    chrome.storage.sync.set({ expireTime: expires });
     const timeRemaining = expires - new Date().getTime(); // time remaining in milliseconds
     const hours = Math.floor(timeRemaining / (60 * 60 * 1000)); // calculate hours
     const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000)); // calculate minutes
@@ -66,7 +87,6 @@ function updateCurrentQueueList(res, userId) {
     $.each(res.videoList, function (index, item) {
         // Start video expire countdown timer
         if (userId === item.userId) startVideoExpireTimer(item.expires);
-
         // For each item in the data, we create a new list item and add it to the list
         const listItem = $('<li>')
             .html(`${userId === item.userId ? '<i class="bi bi-caret-right-fill" style="color: #5d93cb;"></i>' : ''}${index + 1}. `)
@@ -102,6 +122,7 @@ async function setupDashboardPage() {
     const { userId } = await chrome.storage.sync.get(['userId']);
     const { muteQueue } = await chrome.storage.sync.get(['muteQueue']);
     const { playFull } = await chrome.storage.sync.get(['playFull']);
+    const { notifications } = await chrome.storage.sync.get(['notifications']);
 
     const dashboard = document.getElementById('dashboardFadeIn');
     $(dashboard).animate({ opacity: 1 }, 300);
@@ -136,6 +157,8 @@ async function setupDashboardPage() {
     const muteQueueContainer = document.getElementById("muteQueueContainer");
     const playFullSwitch = document.getElementById("playFullSwitch");
     const playFullContainer = document.getElementById("playFullContainer");
+    const notificationsSwitch = document.getElementById("notificationsSwitch");
+    const notificationsContainer = document.getElementById("notificationsContainer");
 
     // If there is already an active queue window, disable the play queue button
     if (activeWindowId) {
@@ -172,24 +195,21 @@ async function setupDashboardPage() {
             }
         });
     });
+    notifications ? notificationsSwitch.classList.add('toggled') : notificationsSwitch.classList.remove('toggled');
+    notificationsContainer.addEventListener('click', function () {
+        chrome.storage.sync.get(['notifications'], async result => {
+            if (result.notifications) {
+                notificationsSwitch.classList.remove('toggled');
+                await chrome.storage.sync.set({ notifications: false });
+            } else {
+                notificationsSwitch.classList.add('toggled');
+                await chrome.storage.sync.set({ notifications: true });
+            }
+        });
+    });
 
     // Fetch video list, update count, and update current queue list
-    $.ajax({
-        url: 'http://54.79.93.12/api/videolist', // replace with your own URL
-        type: 'GET',
-        success: function (res) {
-            // Update current video watch counter
-            setTimeout(() => {
-                updateTotalWatchCount(res);
-            }, 600);
-            // Update current queue list
-            updateCurrentQueueList(res, userId);
-        },
-        error: function () {
-            // This function will be called if there is an error fetching the data
-            console.log('Error fetching data.');
-        }
-    });
+    fetchDataAndPopulatePage(userId);
 
     // When the accordiant title is clicked
     accordian.addEventListener('click', function () {
@@ -399,6 +419,9 @@ async function setupDashboardPage() {
                                 $(sendCreateBtn).hide(0).toggleClass('hidden');
                                 $(endCreateBtn).css({ display: 'flex' });
                             } else if (res.message) {
+                                const oneDay = 24 * 60 * 60 * 1000;
+                                chrome.storage.sync.set({ expireTime: new Date().valueOf() + oneDay });
+                                // fetchDataAndPopulatePage();
                                 inputError.style.color = '#58a75a';
                                 inputError.innerText = res.message;
                                 setTimeout(() => {

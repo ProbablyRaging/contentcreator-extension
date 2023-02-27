@@ -4,6 +4,7 @@
     "version": "1.2.1",
     "description": "Easily earn likes and watch time on your YouTube videos",
     "permissions": [
+        "notifications",
         "storage",
         "tabs"
     ],
