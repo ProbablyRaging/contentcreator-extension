@@ -1,7 +1,7 @@
 {
     "name": "ForTheContent",
     "manifest_version": 3,
-    "version": "1.2.2",
+    "version": "1.2.3",
     "description": "Easily earn likes and watch time on your YouTube videos",
     "permissions": [
         "notifications",
