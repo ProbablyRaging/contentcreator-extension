@@ -109,19 +109,22 @@ function blockTabInteractions() {
     }, 1000);
 }
 
+let playStateChecked;
 let playStateInt;
 function preventPausingVideos() {
     if (!playStateInt) {
         const playButton = document.querySelector('.ytp-play-button');
         if (playButton) {
-            // let checkPlay;
             playStateInt = setInterval(() => {
                 const buttonState = document.querySelector('.ytp-play-button').getAttribute('data-title-no-tooltip');
                 if (buttonState === 'Play') {
                     playButton.click();
                     setTimeout(() => {
                         const newButtonState = document.querySelector('.ytp-play-button').getAttribute('data-title-no-tooltip');
-                        if (newButtonState === 'Play') AddTextToBlocker();
+                        if (!playStateChecked && newButtonState === 'Play') {
+                            AddTextToBlocker();
+                            playStateChecked = true;
+                        }
                     }, 1000);
                 }
             }, 1000);
