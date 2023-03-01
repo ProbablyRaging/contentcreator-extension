@@ -44,6 +44,10 @@ setInterval(async () => {
  * Receiving messages from main.js and popup.js
  */
 let initWindowId;
+let videoIds = [];
+let videoIdsReversed = [];
+let index = 0;
+let indexReversed = 0;
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Login attempt
     if (message.login) {
@@ -79,6 +83,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (chrome.runtime.lastError) return;
             createQueueWindow(window, delaySecondTab);
         });
+    }
+    // If a video duration is available
+    if (message.videoDuration) {
+        setTimeout(() => {
+            message.reversed ? openReversedTab(message.tabId, videoIdsReversed[indexReversed - 1]) : openTab(message.tabId, videoIds[index - 1]);
+        }, message.videoDuration);
     }
     // If the like but was clicked successfully
     if (message.videoLiked) {
@@ -196,8 +206,8 @@ let monitorCheck;
 let monitorCheckTwo;
 let statusChangeCount = 0;
 async function getQueueAndPlay(tabId, reversed) {
-    let videoIds = await getVideoList();
-    if (reversed) videoIds = videoIds.slice().reverse();
+    videoIds = await getVideoList();
+    videoIdsReversed = [...videoIds].reverse();
     // If there are no videos in the list
     if (!videoIds || videoIds.length < 1) {
         try {
@@ -208,57 +218,101 @@ async function getQueueAndPlay(tabId, reversed) {
         }
         return;
     }
-    let index = 0;
-    function openTab(previousVideoId) {
-        reversed ? clearInterval(monitorCheckTwo) : clearInterval(monitorCheck);
-        // Used to determine if the function should continue, can be flagged
-        // by multiple different functions
-        if (preventNext) return;
-        // Award a token on previous video completion
-        if (!reversed && index > 0) awardToken(tabId);
-        if (previousVideoId) incrementWatchCount(tabId, previousVideoId);
-        // Get the availavble video IDs, navigate to the video watch page and watch
-        // the video for 10 minutes before moving on to the next video in the list
-        if (index < videoIds.length) {
-            // Reset the status change count to prevent false positive when a new video is loaded
-            statusChangeCount = 0;
-            // Navigate to video page
-            try {
-                const urlToOpen = `https://www.youtube.com/watch?v=${videoIds[index]}&t=0`;
-                chrome.tabs.update(tabId, { url: urlToOpen }, async function (tab) {
-                    if (chrome.runtime.lastError) return;
-                    reversed ? initMonitoringTwo(tab) : initMonitoring(tab);
-                    // Add a listener to check if a page is refreshed or manually navigated
-                    // Send a message to like the video
-                    sendTabMessage(tab, { sendLike: true, tabId: tab.id, videoId: videoIds[index] });
-                    // Send a message to block page interactions
-                    sendTabMessage(tab, { blockTab: true });
-                    // Send a message to monitor play state
-                    sendTabMessage(tab, { preventPause: true });
-                    // Send a message to check if the user is signed in
-                    sendTabMessage(tab, { checkSignin: true });
-                    index++;
-                    // Wait a determined amount of time before skipping to the next video
-                    const skipToNext = await getVideoDuration(tab);
-                    setTimeout(() => {
-                        openTab(videoIds[index - 1]);
-                    }, skipToNext);
-                });
-            } catch (err) {
-                console.log('There was a problem : ', err);
-            }
-        } else {
-            // If no more videos are available, navigate to the queue finished page
-            try {
-                clearInterval(monitorCheck);
-                const successMessage = 'You have reached the end of the queue';
-                chrome.tabs.update(tabId, { url: `http://54.79.93.12/success?message=${successMessage}` });
-            } catch (err) {
-                console.log('There was a problem : ', err);
-            }
+    reversed ? openReversedTab(tabId) : openTab(tabId);
+}
+
+function openTab(tabId, previousVideoId) {
+    clearInterval(monitorCheck);
+    // Used to determine if the function should continue, can be flagged
+    // by multiple different functions
+    if (preventNext) return;
+    // Award a token on previous video completion
+    if (index > 0) awardToken(tabId);
+    if (previousVideoId) incrementWatchCount(tabId, previousVideoId);
+    // Get the availavble video IDs, navigate to the video watch page and watch
+    // the video for 10 minutes before moving on to the next video in the list
+    if (index < videoIds.length) {
+        // Reset the status change count to prevent false positive when a new video is loaded
+        statusChangeCount = 0;
+        // Navigate to video page
+        try {
+            const urlToOpen = `https://www.youtube.com/watch?v=${videoIds[index]}&t=0`;
+            chrome.tabs.update(tabId, { url: urlToOpen }, async function (tab) {
+                if (chrome.runtime.lastError) return;
+                // Add a listener to check if a page is refreshed or manually navigated
+                initMonitoring(tab);
+                // Send a message to like the video
+                sendTabMessage(tab, { sendLike: true, tabId: tab.id, videoId: videoIds[index] });
+                // Send a message to block page interactions
+                sendTabMessage(tab, { blockTab: true });
+                // Send a message to monitor play state
+                sendTabMessage(tab, { preventPause: true });
+                // Send a message to check if the user is signed in
+                sendTabMessage(tab, { checkSignin: true });
+                // Send a message to check if an ad is playing
+                sendTabMessage(tab, { checkForAds: true, tabId: tab.id, reversed: false });
+                index++;
+            });
+        } catch (err) {
+            console.log('There was a problem : ', err);
+        }
+    } else {
+        // If no more videos are available, navigate to the queue finished page
+        try {
+            clearInterval(monitorCheck);
+            clearInterval(monitorCheckTwo);
+            const successMessage = 'You have reached the end of the queue';
+            chrome.tabs.update(tabId, { url: `http://54.79.93.12/success?message=${successMessage}` });
+        } catch (err) {
+            console.log('There was a problem : ', err);
         }
     }
-    openTab();
+}
+
+function openReversedTab(tabId, previousVideoId) {
+    clearInterval(monitorCheckTwo);
+    // Used to determine if the function should continue, can be flagged
+    // by multiple different functions
+    if (preventNext) return;
+    if (previousVideoId) incrementWatchCount(tabId, previousVideoId);
+    // Get the availavble video IDs, navigate to the video watch page and watch
+    // the video for 10 minutes before moving on to the next video in the list
+    if (indexReversed < videoIdsReversed.length) {
+        // Reset the status change count to prevent false positive when a new video is loaded
+        statusChangeCount = 0;
+        // Navigate to video page
+        try {
+            const urlToOpen = `https://www.youtube.com/watch?v=${videoIdsReversed[indexReversed]}&t=0`;
+            chrome.tabs.update(tabId, { url: urlToOpen }, async function (tab) {
+                if (chrome.runtime.lastError) return;
+                // Add a listener to check if a page is refreshed or manually navigated
+                initMonitoringTwo(tab);
+                // Send a message to like the video
+                sendTabMessage(tab, { sendLike: true, tabId: tab.id, videoId: videoIdsReversed[indexReversed] });
+                // Send a message to block page interactions
+                sendTabMessage(tab, { blockTab: true });
+                // Send a message to monitor play state
+                sendTabMessage(tab, { preventPause: true });
+                // Send a message to check if the user is signed in
+                sendTabMessage(tab, { checkSignin: true });
+                // Send a message to check if an ad is playing
+                sendTabMessage(tab, { checkForAds: true, tabId: tab.id, reversed: true });
+                indexReversed++;
+            });
+        } catch (err) {
+            console.log('There was a problem : ', err);
+        }
+    } else {
+        // If no more videos are available, navigate to the queue finished page
+        try {
+            clearInterval(monitorCheck);
+            clearInterval(monitorCheckTwo);
+            const successMessage = 'You have reached the end of the queue';
+            chrome.tabs.update(tabId, { url: `http://54.79.93.12/success?message=${successMessage}` });
+        } catch (err) {
+            console.log('There was a problem : ', err);
+        }
+    }
 }
 
 // Sets up monitoring of the specified tab in the specified window
@@ -366,30 +420,6 @@ function sendTabMessage(tab, message) {
                         return;
                     }
                 });
-            });
-        }, 1000);
-    });
-}
-
-async function getVideoDuration(tab) {
-    return new Promise((resolve) => {
-        // Set up a status check interval that runs every second
-        const statusCheck = setInterval(() => {
-            // Get the current state of the tab
-            chrome.tabs.get(tab.id, async function (tab) {
-                // If an error occurred, return without doing anything
-                if (chrome.runtime.lastError) return;
-                // Check if the tab has finished loading
-                if (tab.status === 'complete') {
-                    const { playFull } = await chrome.storage.sync.get(['playFull']);
-                    // Send a message to the content script to get the video duration
-                    await chrome.tabs.sendMessage(tab.id, { getDuration: true, playFull }, function (response) {
-                        if (chrome.runtime.lastError) return;
-                        // Once a response is received, clear the status check interval and resolve the Promise with the response
-                        clearInterval(statusCheck);
-                        resolve(response);
-                    });
-                }
             });
         }, 1000);
     });

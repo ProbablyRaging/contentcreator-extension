@@ -3,9 +3,9 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
     if (message.sendLike) {
         findAndClickLikeButton(message.tabId, message.videoId);
     }
-    // Get the duration of the video
-    if (message.getDuration) {
-        sendResponse(getVideoDuration(message.playFull));
+    // Check if an ad is playing
+    if (message.checkForAds) {
+        checkIfAdPlaying(message.tabId, message.reversed);
     }
     // Block tab interaction
     if (message.blockTab) {
@@ -15,7 +15,7 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
     if (message.preventPause) {
         preventPausingVideos();
     }
-
+    // Make sure user is signed in to YouTube
     if (message.checkSignin) {
         checkIfSignedIn();
     }
@@ -32,12 +32,35 @@ function findAndClickLikeButton(tabId, videoId) {
     }
 }
 
-let retries = 0;
-function getVideoDuration(playFull) {
+function checkIfAdPlaying(tabId, reversed) {
+    setTimeout(() => {
+        const intBlockerText = document.querySelector('#interactionBlockerText');
+        const detectAdPlaying = document.querySelector('.ytp-ad-simple-ad-badge');
+        const skipAdButton = document.querySelector('.ytp-ad-skip-button');
+        // If video interacted with and not ad detected, get the video duration
+        if (!intBlockerText && !detectAdPlaying) {
+            getVideoDuration(tabId, reversed)
+            return;
+        }
+        // If video not interacted with an ad is playing
+        if (!intBlockerText && detectAdPlaying && skipAdButton) {
+            // Click the skip ad button if it's available
+            skipAdButton.click();
+            checkIfAdPlaying(tabId, reversed);
+        } else {
+            checkIfAdPlaying(tabId, reversed);
+        }
+    }, 5000);
+}
+
+let durationRetries = 0;
+async function getVideoDuration(tabId, reversed) {
+    const { playFull } = await chrome.storage.sync.get(['playFull']);
     // Fallback if we can't find a duration
-    if (retries >= 5) {
-        retries = 0;
-        return 600000;
+    if (durationRetries >= 15) {
+        durationRetries = 0;
+        chrome.runtime.sendMessage({ videoDuration: 600000, tabId: tabId, reversed: reversed });
+        return;
     };
     const durationStr = document.querySelector('.ytp-time-duration').innerHTML;
     if (durationStr) {
@@ -59,11 +82,14 @@ function getVideoDuration(playFull) {
         if (playFull) return durationMs;
         // Limit the duration to 10 minutes
         const returnedDuration = durationMs > 600000 ? 600000 : durationMs;
-        return returnedDuration;
+        chrome.runtime.sendMessage({ videoDuration: returnedDuration, tabId: tabId, reversed: reversed });
+        return;
     } else {
         // If the duration string is not found, wait and try again
-        retries++
-        setTimeout(getVideoDuration, 1000);
+        durationRetries++
+        setTimeout(() => {
+            getVideoDuration(tabId, reversed);
+        }, 1000);
     }
 }
 
