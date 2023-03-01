@@ -36,6 +36,8 @@ function fetchDataAndPopulatePage(userId) {
             }, 600);
             // Update current queue list
             updateCurrentQueueList(res, userId);
+            const oneHour = 60 * 60 * 1000;
+            chrome.storage.sync.set({ nextPopulateTimestamp: new Date().valueOf() + oneHour });
         },
         error: function () {
             // This function will be called if there is an error fetching the data
@@ -44,67 +46,136 @@ function fetchDataAndPopulatePage(userId) {
     });
 }
 
-function startVideoExpireTimer(expires) {
-    chrome.storage.sync.set({ expireTime: expires });
-    const timeRemaining = expires - new Date().getTime(); // time remaining in milliseconds
-    const hours = Math.floor(timeRemaining / (60 * 60 * 1000)); // calculate hours
-    const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000)); // calculate minutes
-    const seconds = Math.floor((timeRemaining % (60 * 1000)) / 1000); // calculate seconds
-    timeToReset.innerText = `Your video expires in ${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
-    setInterval(() => {
+async function startVideoExpireTimer(expires, useCached) {
+    if (useCached) {
+        const { expireTime } = await chrome.storage.sync.get(['expireTime']);
+        const timeRemaining = expireTime - new Date().getTime(); // time remaining in milliseconds
+        const hours = Math.floor(timeRemaining / (60 * 60 * 1000)); // calculate hours
+        const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000)); // calculate minutes
+        const seconds = Math.floor((timeRemaining % (60 * 1000)) / 1000); // calculate seconds
+        timeToReset.innerText = `Your video expires in ${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
+        setInterval(() => {
+            const timeRemaining = expireTime - new Date().getTime(); // time remaining in milliseconds
+            const hours = Math.floor(timeRemaining / (60 * 60 * 1000)); // calculate hours
+            const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000)); // calculate minutes
+            const seconds = Math.floor((timeRemaining % (60 * 1000)) / 1000); // calculate seconds
+            timeToReset.innerText = `Your video expires in ${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
+        }, 1000);
+    } else {
+        chrome.storage.sync.set({ expireTime: expires });
         const timeRemaining = expires - new Date().getTime(); // time remaining in milliseconds
         const hours = Math.floor(timeRemaining / (60 * 60 * 1000)); // calculate hours
         const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000)); // calculate minutes
         const seconds = Math.floor((timeRemaining % (60 * 1000)) / 1000); // calculate seconds
         timeToReset.innerText = `Your video expires in ${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
-    }, 1000);
+        setInterval(() => {
+            const timeRemaining = expires - new Date().getTime(); // time remaining in milliseconds
+            const hours = Math.floor(timeRemaining / (60 * 60 * 1000)); // calculate hours
+            const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000)); // calculate minutes
+            const seconds = Math.floor((timeRemaining % (60 * 1000)) / 1000); // calculate seconds
+            timeToReset.innerText = `Your video expires in ${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
+        }, 1000);
+    }
 }
 
-function updateTotalWatchCount(res) {
-    const watchCount = document.getElementById('watchCount');
-    watchCount.innerHTML = `<p class="wc-number count-up">0</p> ${watchCount.innerText}`;
-    $({ countNum: 0 }).animate(
-        { countNum: res.watchCount },
-        {
-            duration: 1000,
-            easing: 'linear',
-            step: function () {
-                watchCount.querySelector('.count-up').innerText = numberWithCommas(this.countNum.toFixed(0));
-            },
-            complete: function () {
-                watchCount.querySelector('.count-up').innerText = numberWithCommas(res.watchCount);
-            }
-        }
-    );
-}
-
-function updateCurrentQueueList(res, userId) {
-    const listTitle = document.getElementById('list-title');
-    listTitle.innerHTML = `Current Queue (${res.videoList.length}) <i class="bi bi-caret-down-fill accordian-caret"></i>`
-    // This function will be called when the data is successfully fetched
-    // We can use the data to dynamically generate an unordered list
-    const list = $('<ul class="hidden-list">');
-    $.each(res.videoList, function (index, item) {
-        // Start video expire countdown timer
-        if (userId === item.userId) startVideoExpireTimer(item.expires);
-        // For each item in the data, we create a new list item and add it to the list
-        const listItem = $('<li>')
-            .html(`${userId === item.userId ? '<i class="bi bi-caret-right-fill" style="color: #5d93cb;"></i>' : ''}${index + 1}. `)
-            .append(
-                $('<a>')
-                    .attr('href', `https://youtube.com/watch?v=${item.videoId}`)
-                    .attr('target', '_blank')
-                    .text(`youtu.be/${item.videoId}`)
-            )
-            .append(
-                $('<span>')
-                    .text(` - Views: ${item.watches}`)
+async function updateTotalWatchCount(res, useCached) {
+    if (useCached) {
+        const { cachedWatchCount } = await chrome.storage.sync.get(['cachedWatchCount']);
+        const watchCount = document.getElementById('watchCount');
+        watchCount.innerHTML = `<p class="wc-number count-up">0</p> ${watchCount.innerText}`;
+        setTimeout(() => {
+            $({ countNum: 0 }).animate(
+                { countNum: cachedWatchCount },
+                {
+                    duration: 1000,
+                    easing: 'linear',
+                    step: function () {
+                        watchCount.querySelector('.count-up').innerText = numberWithCommas(this.countNum.toFixed(0));
+                    },
+                    complete: function () {
+                        watchCount.querySelector('.count-up').innerText = numberWithCommas(cachedWatchCount);
+                    }
+                }
             );
-        // Append formatted item to list
-        list.append(listItem);
-    });
-    // Finally, we append the list to a container element in the HTML
-    $('#videoList').append(list);
+        }, 700);
+    } else {
+        chrome.storage.sync.set({ cachedWatchCount: res.watchCount });
+        const watchCount = document.getElementById('watchCount');
+        watchCount.innerHTML = `<p class="wc-number count-up">0</p> ${watchCount.innerText}`;
+        $({ countNum: 0 }).animate(
+            { countNum: res.watchCount },
+            {
+                duration: 1000,
+                easing: 'linear',
+                step: function () {
+                    watchCount.querySelector('.count-up').innerText = numberWithCommas(this.countNum.toFixed(0));
+                },
+                complete: function () {
+                    watchCount.querySelector('.count-up').innerText = numberWithCommas(res.watchCount);
+                }
+            }
+        );
+    }
+}
+
+async function updateCurrentQueueList(res, userId, useCached) {
+    if (useCached) {
+        const { cachedVideoList } = await chrome.storage.sync.get(['cachedVideoList']);
+        const listTitle = document.getElementById('list-title');
+        listTitle.innerHTML = `Current Queue (${cachedVideoList.length}) <i class="bi bi-caret-down-fill accordian-caret"></i>`
+        // This function will be called when the data is successfully fetched
+        // We can use the data to dynamically generate an unordered list
+        const list = $('<ul class="hidden-list">');
+        $.each(cachedVideoList, function (index, item) {
+            // Start video expire countdown timer
+            if (userId === item.userId) startVideoExpireTimer(item.expires);
+            // For each item in the data, we create a new list item and add it to the list
+            const listItem = $('<li>')
+                .html(`${userId === item.userId ? '<i class="bi bi-caret-right-fill" style="color: #5d93cb;"></i>' : ''}${index + 1}. `)
+                .append(
+                    $('<a>')
+                        .attr('href', `https://youtube.com/watch?v=${item.videoId}`)
+                        .attr('target', '_blank')
+                        .text(`youtu.be/${item.videoId}`)
+                )
+                .append(
+                    $('<span>')
+                        .text(` - Views: ${item.watches}`)
+                );
+            // Append formatted item to list
+            list.append(listItem);
+        });
+        // Finally, we append the list to a container element in the HTML
+        $('#videoList').append(list);
+    } else {
+        chrome.storage.sync.set({ cachedVideoList: res.videoList });
+        const listTitle = document.getElementById('list-title');
+        listTitle.innerHTML = `Current Queue (${res.videoList.length}) <i class="bi bi-caret-down-fill accordian-caret"></i>`
+        // This function will be called when the data is successfully fetched
+        // We can use the data to dynamically generate an unordered list
+        const list = $('<ul class="hidden-list">');
+        $.each(res.videoList, function (index, item) {
+            // Start video expire countdown timer
+            if (userId === item.userId) startVideoExpireTimer(item.expires);
+            // For each item in the data, we create a new list item and add it to the list
+            const listItem = $('<li>')
+                .html(`${userId === item.userId ? '<i class="bi bi-caret-right-fill" style="color: #5d93cb;"></i>' : ''}${index + 1}. `)
+                .append(
+                    $('<a>')
+                        .attr('href', `https://youtube.com/watch?v=${item.videoId}`)
+                        .attr('target', '_blank')
+                        .text(`youtu.be/${item.videoId}`)
+                )
+                .append(
+                    $('<span>')
+                        .text(` - Views: ${item.watches}`)
+                );
+            // Append formatted item to list
+            list.append(listItem);
+        });
+        // Finally, we append the list to a container element in the HTML
+        $('#videoList').append(list);
+    }
 }
 
 function numberWithCommas(x) {
@@ -120,6 +191,7 @@ function numberWithCommas(x) {
 async function setupDashboardPage() {
     const { activeWindowId } = await chrome.storage.sync.get(['activeWindowId']);
     const { userId } = await chrome.storage.sync.get(['userId']);
+    const { nextPopulateTimestamp } = await chrome.storage.sync.get(['nextPopulateTimestamp']);
     const { notifications } = await chrome.storage.sync.get(['notifications']);
     const { discordNotification } = await chrome.storage.sync.get(['discordNotification']);
     const { browserNotification } = await chrome.storage.sync.get(['browserNotification']);
@@ -141,6 +213,15 @@ async function setupDashboardPage() {
         $('#accordian').animate({ opacity: 1 }, 300);
         $('.footer').animate({ opacity: 1 }, 300);
     }, 770);
+
+    // Fetch video list, update count, and update current queue list
+    if (!nextPopulateTimestamp || new Date().valueOf() > nextPopulateTimestamp) {
+        fetchDataAndPopulatePage(userId);
+    } else {
+        updateTotalWatchCount(null, true);
+        startVideoExpireTimer(null, true);
+        updateCurrentQueueList(null, userId, true);
+    }
 
     const settingsBtn = document.getElementById('settingsBtn');
     const settingsMenu = document.getElementById('settingsMenu');
@@ -231,9 +312,6 @@ async function setupDashboardPage() {
             }
         });
     });
-
-    // Fetch video list, update count, and update current queue list
-    fetchDataAndPopulatePage(userId);
 
     // When the accordiant title is clicked
     accordian.addEventListener('click', function () {

@@ -37,7 +37,6 @@ function setupStatsPage() {
 
     setTimeout(() => {
         $('.stats-box').animate({ opacity: 1 }, 300);
-        $('.stats-countdown').animate({ opacity: 1 }, 300);
         $('.footer').animate({ opacity: 1 }, 300);
     }, 770);
 
