@@ -107,3 +107,10 @@ p {
     filter: brightness(0.5);
     cursor: default !important;
 }
+
+.div-divider {
+    height: 1px;
+    width: 85%;
+    background: #252b3a;
+    margin-left: 26px;
+}

@@ -120,9 +120,11 @@ function numberWithCommas(x) {
 async function setupDashboardPage() {
     const { activeWindowId } = await chrome.storage.sync.get(['activeWindowId']);
     const { userId } = await chrome.storage.sync.get(['userId']);
+    const { notifications } = await chrome.storage.sync.get(['notifications']);
+    const { discordNotification } = await chrome.storage.sync.get(['discordNotification']);
+    const { browserNotification } = await chrome.storage.sync.get(['browserNotification']);
     const { muteQueue } = await chrome.storage.sync.get(['muteQueue']);
     const { playFull } = await chrome.storage.sync.get(['playFull']);
-    const { notifications } = await chrome.storage.sync.get(['notifications']);
 
     const dashboard = document.getElementById('dashboardFadeIn');
     $(dashboard).animate({ opacity: 1 }, 300);
@@ -153,12 +155,12 @@ async function setupDashboardPage() {
     const sendCreateBtn = document.getElementById('sendCreateBtn');
     const tokenData = document.getElementById('tokenData');
     const accordian = document.getElementById('list-title');
-    const muteQueueSwitch = document.getElementById("muteQueueSwitch");
-    const muteQueueContainer = document.getElementById("muteQueueContainer");
-    const playFullSwitch = document.getElementById("playFullSwitch");
-    const playFullContainer = document.getElementById("playFullContainer");
     const notificationsSwitch = document.getElementById("notificationsSwitch");
-    const notificationsContainer = document.getElementById("notificationsContainer");
+    const notificationsAlt = document.getElementById("notificationsAlt");
+    const discordSwitch = document.getElementById("discordSwitch");
+    const browserSwitch = document.getElementById("browserSwitch");
+    const muteQueueSwitch = document.getElementById("muteQueueSwitch");
+    const playFullSwitch = document.getElementById("playFullSwitch");
 
     // If there is already an active queue window, disable the play queue button
     if (activeWindowId) {
@@ -171,39 +173,61 @@ async function setupDashboardPage() {
     }
 
     // Settings switches
-    muteQueue ? muteQueueSwitch.classList.add('toggled') : muteQueueSwitch.classList.remove('toggled');
-    muteQueueContainer.addEventListener('click', function () {
+    if (notifications) {
+        notificationsSwitch.checked = true
+        notificationsAlt.style.display = 'block';
+    } else {
+        notificationsSwitch.checked = false;
+        notificationsAlt.style.display = 'none';
+    }
+    notificationsSwitch.addEventListener('click', function () {
+        chrome.storage.sync.get(['notifications'], async result => {
+            if (result.notifications) {
+                await chrome.storage.sync.set({ notifications: false });
+                notificationsAlt.style.display = 'none';
+            } else {
+                await chrome.storage.sync.set({ notifications: true });
+                notificationsAlt.style.display = 'block';
+            }
+        });
+    });
+    discordNotification ? discordSwitch.checked = true : discordSwitch.checked = false;
+    discordSwitch.addEventListener('click', function () {
+        chrome.storage.sync.get(['discordNotification'], async result => {
+            if (result.discordNotification) {
+                await chrome.storage.sync.set({ discordNotification: false });
+            } else {
+                await chrome.storage.sync.set({ discordNotification: true });
+            }
+        });
+    });
+    browserNotification ? browserSwitch.checked = true : browserSwitch.checked = false;
+    browserSwitch.addEventListener('click', function () {
+        chrome.storage.sync.get(['browserNotification'], async result => {
+            if (result.browserNotification) {
+                await chrome.storage.sync.set({ browserNotification: false });
+            } else {
+                await chrome.storage.sync.set({ browserNotification: true });
+            }
+        });
+    });
+    muteQueue ? muteQueueSwitch.checked = true : muteQueueSwitch.checked = false;
+    muteQueueSwitch.addEventListener('click', function () {
         chrome.storage.sync.get(['muteQueue'], async result => {
             if (result.muteQueue) {
-                muteQueueSwitch.classList.remove('toggled');
                 await chrome.storage.sync.set({ muteQueue: false });
             } else {
-                muteQueueSwitch.classList.add('toggled');
                 await chrome.storage.sync.set({ muteQueue: true });
             }
         });
     });
-    playFull ? playFullSwitch.classList.add('toggled') : playFullSwitch.classList.remove('toggled');
-    playFullContainer.addEventListener('click', function () {
+    playFull ? playFullSwitch.checked = true : playFullSwitch.checked = false;
+    playFullSwitch.addEventListener('click', function () {
         chrome.storage.sync.get(['playFull'], async result => {
             if (result.playFull) {
-                playFullSwitch.classList.remove('toggled');
                 await chrome.storage.sync.set({ playFull: false });
             } else {
-                playFullSwitch.classList.add('toggled');
                 await chrome.storage.sync.set({ playFull: true });
-            }
-        });
-    });
-    notifications ? notificationsSwitch.classList.add('toggled') : notificationsSwitch.classList.remove('toggled');
-    notificationsContainer.addEventListener('click', function () {
-        chrome.storage.sync.get(['notifications'], async result => {
-            if (result.notifications) {
-                notificationsSwitch.classList.remove('toggled');
-                await chrome.storage.sync.set({ notifications: false });
-            } else {
-                notificationsSwitch.classList.add('toggled');
-                await chrome.storage.sync.set({ notifications: true });
             }
         });
     });

@@ -1,26 +1,42 @@
 chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === 'install') {
         chrome.storage.sync.set({ notifications: true });
+        chrome.storage.sync.set({ browserNotification: true });
         chrome.storage.sync.set({ muteQueue: true });
     }
 });
 
+/**
+ * Handle sending notifications
+ */
 setInterval(async () => {
+    const { userId } = await chrome.storage.sync.get(['userId']);
     const { notifications } = await chrome.storage.sync.get(['notifications']);
+    const { discordNotification } = await chrome.storage.sync.get(['discordNotification']);
+    const { browserNotification } = await chrome.storage.sync.get(['browserNotification']);
     const { expireTime } = await chrome.storage.sync.get(['expireTime']);
     const { notificationSent } = await chrome.storage.sync.get(['notificationSent']);
     if (notifications && expireTime && new Date().valueOf() > expireTime) {
-        if (!notificationSent) chrome.notifications.create({
-            type: 'basic',
-            iconUrl: '/assets/icons/icon128.png',
-            title: 'ForTheContent',
-            message: 'You are eligible to submit a new video',
-        });
+        if (browserNotification && !notificationSent) {
+            chrome.notifications.create({
+                type: 'basic',
+                iconUrl: '/assets/icons/icon128.png',
+                title: 'ForTheContent',
+                message: 'You are eligible to submit a new video',
+            });
+        }
+        if (userId && discordNotification && !notificationSent) {
+            fetch('http://54.79.93.12/api/sendnotification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: userId })
+            });
+        }
         await chrome.storage.sync.set({ notificationSent: true });
     } else {
         await chrome.storage.sync.set({ notificationSent: false });
     }
-}, 10 * 60 * 1000);
+}, 5 * 60 * 1000);
 
 /**
  * Receiving messages from main.js and popup.js
@@ -79,7 +95,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 /**
- * Handling user authentication
+ * Handle user authentication
  */
 function checkAuthState(window) {
     chrome.tabs.get(window.tabs[0].id, function (tab) {
@@ -123,7 +139,7 @@ function handleAuthentication(success) {
 }
 
 /**
- * Handling playing queue
+ * Handle playing queue
  */
 async function createQueueWindow(window, delaySecondTab) {
     try {

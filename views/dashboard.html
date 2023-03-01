@@ -50,9 +50,9 @@
             <div id="logoutBtn" class="footer-btn logout" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Logout">
                 <i class="bi bi-arrow-return-left"></i>
             </div>
-            
+
             <p id="input-error" class="input-error"></p>
-            <input id="createInput" type="text" placeholder="Enter video ID"></input>
+            <input id="createInput" type="text" placeholder="Enter video URL or ID"></input>
 
             <div id="createBtn" class="footer-btn" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Submit Video">
                 <i class="bi bi-plus-lg"></i>
@@ -79,21 +79,41 @@
             <div class="settings-div">
                 <div class="settings-wrapper">
                     <div class="switch-wrapper">
-                        <p class="switch-label">Notifications <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Sends a browser notification when you're eligible to submit a video"></i></p>
-                        <div id="notificationsContainer" class="toggle-container">
-                            <button id="notificationsSwitch" class="toggle-button"></button>
+                        <p class="switch-label">Notifications <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Receive a notification when you're eligible to submit a video"></i></p>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="notificationsSwitch">
                         </div>
                     </div>
+                    <div id="notificationsAlt" class="notifications-alt">
+                        <div class="switch-wrapper">
+                            <p class="switch-label">Discord <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Receive notifications via Discord"></i></p>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="discordSwitch">
+                            </div>
+                        </div>
+                        <div class="switch-wrapper">
+                            <p class="switch-label">Browser <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Receive notifications via browser"></i></p>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="browserSwitch">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="div-divider"></div>
+
                     <div class="switch-wrapper">
-                        <p class="switch-label">Mute Queue Window <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Plays videos with no sound"></i></p>
-                        <div id="muteQueueContainer" class="toggle-container">
-                            <button id="muteQueueSwitch" class="toggle-button"></button>
+                        <p class="switch-label">Mute Queue Window <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Play videos with no sound"></i></p>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="muteQueueSwitch">
                         </div>
                     </div>
+
+                    <div class="div-divider"></div>
+
                     <div class="switch-wrapper">
                         <p class="switch-label">Play Full Video <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Play videos for the full length"></i></p>
-                        <div id="playFullContainer" class="toggle-container">
-                            <button id="playFullSwitch" class="toggle-button"></button>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="playFullSwitch">
                         </div>
                     </div>
                 </div>

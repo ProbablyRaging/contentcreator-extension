@@ -549,10 +549,10 @@ button.complete .successMessage svg {
     justify-content: space-between;
     align-items: center;
     height: 36px;
-    background: #00000052;
     border-radius: 10px;
-    padding: 5px 18px;
-    margin: 10px 18px;
+    padding: 0 18px;
+    margin: 0 18px;
+    box-sizing: border-box;
 }
 
 .switch-wrapper .bi {
@@ -565,69 +565,36 @@ button.complete .successMessage svg {
 .switch-label {
     display: flex;
     align-items: center;
+    font-size: 12px;
 }
 
-.switch-label img {
-    width: 18px;
-    margin-right: 4px;
+.notifications-alt .switch-label {
+    margin-left: 18px;
 }
 
-.toggle-container {
-    display: inline-block;
-    position: sticky;
-    right: 10px;
-    width: 32px;
-    height: 12px;
-    border-radius: 34px;
-    background-color: #555;
+.form-check {
+    min-height: 0;
+}
+
+.form-check-input {
     cursor: pointer;
+    border: 1px solid #7c859b;
+    background-color: #ffffff0d;
 }
 
-.toggle-button {
-    background: #838383;
-    position: absolute;
-    top: 5px;
-    left: 8;
-    width: 16px;
-    height: 19px;
-    border-radius: 30px;
-    border: none;
-    cursor: pointer;
-    transition: left 0.2s ease;
+.form-check-input:focus {
+    box-shadow: none;
+    border-color: #7c859b;
 }
 
-.toggle-container:before {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 14px;
-    color: #fff;
-    font-weight: bold;
+.form-check-input:checked {
+    background-color: #ffffff0d;
+    border-color: #eb5967;
+    background-image: url('../assets/images/button-inner.svg') !important;
 }
 
-.toggle-container:after {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 14px;
-    color: #fff;
-    font-weight: bold;
-    opacity: 0;
-}
-
-.toggle-button.toggled {
-    left: calc(100% - 8px);
-    background-color: #eb5967;
-}
-
-.toggle-button.toggled+.toggle-container:before {
-    opacity: 0;
-}
-
-.toggle-button.toggled+.toggle-container:after {
-    opacity: 1;
+.form-switch .form-check-input {
+    background-image: url('../assets/images/button-inner-disabled.svg');
 }
 
 .blur::before {
