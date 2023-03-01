@@ -35,23 +35,33 @@ function findAndClickLikeButton(tabId, videoId) {
 let retries = 0;
 function getVideoDuration(playFull) {
     // Fallback if we can't find a duration
-    if (retries >= 3) {
+    if (retries >= 5) {
         retries = 0;
         return 600000;
     };
     const durationStr = document.querySelector('.ytp-time-duration').innerHTML;
     if (durationStr) {
-        const [minutesStr, secondsStr] = durationStr.split(':');
-        const minutes = parseInt(minutesStr, 10);
-        const seconds = parseInt(secondsStr, 10);
-        const durationMs = (minutes * 60 + seconds) * 1000;
+        const parts = durationStr.split(':');
+        let durationMs = 0;
+        if (parts.length === 2) {
+            const [minutesStr, secondsStr] = parts;
+            const minutes = parseInt(minutesStr, 10);
+            const seconds = parseInt(secondsStr, 10);
+            durationMs = (minutes * 60 + seconds) * 1000;
+        } else if (parts.length === 3) {
+            const [hoursStr, minutesStr, secondsStr] = parts;
+            const hours = parseInt(hoursStr, 10);
+            const minutes = parseInt(minutesStr, 10);
+            const seconds = parseInt(secondsStr, 10);
+            durationMs = (hours * 3600 + minutes * 60 + seconds) * 1000;
+        }
         // If the play full video option is enabled
         if (playFull) return durationMs;
         // Limit the duration to 10 minutes
         const returnedDuration = durationMs > 600000 ? 600000 : durationMs;
         return returnedDuration;
     } else {
-        // If the duration string is not found, wait amd try again
+        // If the duration string is not found, wait and try again
         retries++
         setTimeout(getVideoDuration, 1000);
     }
