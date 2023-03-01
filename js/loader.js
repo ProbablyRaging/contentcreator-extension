@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    chrome.action.setBadgeText({ text: '' });
     const urlParams = new URLSearchParams(window.location.search);
     const params = urlParams.get('data');
     // Check if user has an active session

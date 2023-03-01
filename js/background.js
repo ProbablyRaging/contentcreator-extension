@@ -32,6 +32,8 @@ setInterval(async () => {
                 body: JSON.stringify({ userId: userId })
             });
         }
+        chrome.action.setBadgeBackgroundColor({ color: '#ed5a64' });
+        chrome.action.setBadgeText({ text: '1' });
         await chrome.storage.sync.set({ notificationSent: true });
     } else {
         await chrome.storage.sync.set({ notificationSent: false });
