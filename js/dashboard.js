@@ -128,8 +128,6 @@ async function updateCurrentQueueList(res, userId, useCached) {
         // We can use the data to dynamically generate an unordered list
         const list = $('<ul class="hidden-list">');
         $.each(cachedVideoList, function (index, item) {
-            // Start video expire countdown timer
-            if (userId === item.userId) startVideoExpireTimer(item.expires);
             // For each item in the data, we create a new list item and add it to the list
             const listItem = $('<li>')
                 .html(`${userId === item.userId ? '<i class="bi bi-caret-right-fill" style="color: #5d93cb;"></i>' : ''}${index + 1}. `)
