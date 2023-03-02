@@ -544,6 +544,12 @@ button.complete .successMessage svg {
     width: 100%;
 }
 
+.ext-info {
+    font-size: 8px;
+    text-align: center;
+    width: 80%;
+}
+
 .switch-wrapper {
     display: flex;
     justify-content: space-between;

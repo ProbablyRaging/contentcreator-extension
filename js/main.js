@@ -192,7 +192,7 @@ function AddTextToBlocker() {
         const countdownInterval = setInterval(() => {
             const textDiv = document.querySelector('#interactionBlockerText');
             if (!textDiv) {
-                clearInterval(countdownInterval)
+                clearInterval(countdownInterval);
                 return;
             }
             if (countdown === 0) {

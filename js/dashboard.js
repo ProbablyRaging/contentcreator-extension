@@ -49,6 +49,7 @@ function fetchDataAndPopulatePage(userId) {
 async function startVideoExpireTimer(expires, useCached) {
     if (useCached) {
         const { expireTime } = await chrome.storage.sync.get(['expireTime']);
+        if (!expireTime) return;
         const timeRemaining = expireTime - new Date().getTime(); // time remaining in milliseconds
         const hours = Math.floor(timeRemaining / (60 * 60 * 1000)); // calculate hours
         const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000)); // calculate minutes
@@ -178,6 +179,24 @@ async function updateCurrentQueueList(res, userId, useCached) {
     }
 }
 
+async function updateUserTokensCount(userId, element) {
+    $.ajax({
+        url: 'http://54.79.93.12/api/usertokens',
+        type: 'POST',
+        data: {
+            userId: userId,
+        },
+        success: function (res) {
+            // Update current user tokens
+            element.innerText = res.tokens;
+        },
+        error: function () {
+            // This function will be called if there is an error fetching the data
+            console.log('Error fetching data.');
+        }
+    });
+}
+
 function numberWithCommas(x) {
     if (x >= 1000000) {
         return (x / 1000000).toFixed(1) + 'M';
@@ -214,15 +233,6 @@ async function setupDashboardPage() {
         $('.footer').animate({ opacity: 1 }, 300);
     }, 770);
 
-    // Fetch video list, update count, and update current queue list
-    if (!nextPopulateTimestamp || new Date().valueOf() > nextPopulateTimestamp) {
-        fetchDataAndPopulatePage(userId);
-    } else {
-        updateTotalWatchCount(null, true);
-        startVideoExpireTimer(null, true);
-        updateCurrentQueueList(null, userId, true);
-    }
-
     const settingsBtn = document.getElementById('settingsBtn');
     const settingsMenu = document.getElementById('settingsMenu');
     const button = document.getElementById('button');
@@ -242,6 +252,16 @@ async function setupDashboardPage() {
     const browserSwitch = document.getElementById("browserSwitch");
     const muteQueueSwitch = document.getElementById("muteQueueSwitch");
     const playFullSwitch = document.getElementById("playFullSwitch");
+
+    // Fetch video list, update count, and update current queue list
+    if (!nextPopulateTimestamp || new Date().valueOf() > nextPopulateTimestamp) {
+        fetchDataAndPopulatePage(userId);
+    } else {
+        updateTotalWatchCount(null, true);
+        startVideoExpireTimer(null, true);
+        updateCurrentQueueList(null, userId, true);
+        updateUserTokensCount(userId, tokenData);
+    }
 
     // If there is already an active queue window, disable the play queue button
     if (activeWindowId) {
@@ -334,7 +354,7 @@ async function setupDashboardPage() {
     });
 
     // When the settings button is clicked
-    settingsBtn.addEventListener('click', function () {
+    settingsBtn.addEventListener('click', async function () {
         if (!settingsMenu.classList.contains('shown')) {
             $(dashboard).find(settingsBtn).siblings().not(settingsBtn).css('filter', 'blur(2px)');
             const bodyBlur = document.createElement("div");
@@ -347,6 +367,9 @@ async function setupDashboardPage() {
             bodyBlur.style.backgroundColor = '#00000029';
             bodyBlur.style.backdropFilter = 'blur(3px)';
             bodyBlur.style.zIndex = '2';
+            // Get OS and extension version
+            const extInfo = document.querySelector('#extInfo');
+            extInfo.innerHTML = `v${chrome.runtime.getManifest().version} | ${navigator.userAgent}`
             // Aloow the settings menu to be closed by clicking outside of it
             bodyBlur.onclick = function () {
                 $(dashboard).find(settingsBtn).siblings().not(settingsBtn).css('filter', 'blur(0px)');
