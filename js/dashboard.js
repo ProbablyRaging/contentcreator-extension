@@ -425,7 +425,7 @@ async function setupDashboardPage() {
     // When the logout button is clicked
     logoutBtn.addEventListener('click', async function () {
         $.ajax({
-            url: 'http://lo/api/logout',
+            url: 'http://54.79.93.12/api/logout',
             type: 'POST',
             data: {
                 userId: userId,

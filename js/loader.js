@@ -55,8 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         $('page-content').attr('page', 'statistics');
                     }
                     $(body).animate({ opacity: 1 }, 300);
-                    $(body).addClass('body-bg');
-                    $('.body-bg').animate({ 'background-position-y': '-14px' }, 300);
                 }
             });
         });

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="720" height="1200" viewBox="0 0 720 1200">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #424fe0;
+        fill-rule: evenodd;
+        filter: url(#filter);
+      }
+    </style>
+    <filter id="filter" x="-1790.38" y="-487.219" width="4300.76" height="685.438" filterUnits="userSpaceOnUse">
+      <feFlood result="flood" flood-color="#2f5ed4"/>
+      <feComposite result="composite" operator="in" in2="SourceGraphic"/>
+      <feBlend result="blend" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  <path id="Rounded_Rectangle_1" data-name="Rounded Rectangle 1" class="cls-1" d="M367.881-486.723L2507.1-145.774c4.36,0.695,4.36,1.821,0,2.516L367.881,197.691a60.028,60.028,0,0,1-15.787,0L-1787.12-143.258c-4.36-.695-4.36-1.821,0-2.516L352.094-486.723A60.028,60.028,0,0,1,367.881-486.723Z"/>
+</svg>

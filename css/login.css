@@ -1,14 +1,24 @@
 .header {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     user-select: none;
+    position: absolute;
+    top: 8px;
+    gap: 8px;
 }
 
 .header img {
-    width: 34px;
-    background: #1f2335ad;
-    padding: 12px;
-    border-radius: 25%;
+    width: 72px;
+}
+
+.header-text {
+    font-size: 24px;
+    font-weight: 100;
+}
+
+.header-text-bold {
+    font-weight: 600;
 }
 
 .content {
@@ -26,6 +36,8 @@
 .login-wrapper {
     display: flex;
     justify-content: center;
+    position: absolute;
+    top: 230px;
 }
 
 .login-items {
@@ -40,26 +52,63 @@
     justify-content: center;
     align-items: center;
     border-radius: 100px;
-    border: none;
+    border: 1px solid;
     padding: 12px 26px;
-    background-color: #1f2335;
+    width: 200px;
+    background-color: #6e44ff;
     font-family: 'Roboto', Arial;
     font-size: 14px;
     font-weight: 500;
     height: 40px;
-    transition: filter 0.2s ease;
+    transition: background-color 0.2s ease, border 0.2s ease !important;
+}
+
+.sml {
+    font-size: 10px;
+    width: 120px;
+    height: 8px;
+    padding: 8px;
 }
 
 .btn:hover {
-    background-color: #1f2335;
-    filter: brightness(1.2);
+    background-color: #693eff;
+    border: 1px solid #d7d7d7;
 }
 
 .btn:active,
 .btn:focus-visible {
-    background-color: #272b3e !important;
+    background-color: #693eff !important;
+    border: 1px solid #fff !important;
 }
 
 .btn:disabled {
-    background-color: #1f2335ad;
+    background-color: #683eff81 !important;
+    border: 1px solid #fff !important;
+}
+
+.bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    top: 300px;
+}
+
+.bottom p {
+    font-size: 10px;
+    margin-bottom: 6px;
+}
+
+.footer {
+    opacity: 0;
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    margin-bottom: 6px;
+}
+
+.footer a {
+    text-decoration: none;
 }

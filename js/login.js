@@ -20,6 +20,7 @@ function checkLoginPage() {
 function setupLoginPage() {
     setTimeout(() => {
         $('.content').animate({ opacity: 1 }, 300);
+        $('.footer').animate({ opacity: 1 }, 300);
     }, 570);
 
     const authButton = document.getElementById('discordAuth');
