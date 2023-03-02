@@ -545,6 +545,9 @@ button.complete .successMessage svg {
 }
 
 .ext-info {
+    position: absolute;
+    bottom: 100;
+    color: #b3b3b3;
     font-size: 8px;
     text-align: center;
     width: 80%;

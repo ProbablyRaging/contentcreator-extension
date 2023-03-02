@@ -1,26 +1,18 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const { nextPopulateTimestamp } = await chrome.storage.sync.get(['nextPopulateTimestamp']);
     chrome.action.setBadgeText({ text: '' });
     const urlParams = new URLSearchParams(window.location.search);
     const params = urlParams.get('data');
     // Check if user has an active session
     const { userId } = await chrome.storage.sync.get(['userId']);
     setTimeout(async () => {
-        const body = document.body;
-        let data;
+        const response = await fetch('http://54.79.93.12/api/getuser', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: userId })
+        });
 
-        if (!nextPopulateTimestamp || new Date().valueOf() > nextPopulateTimestamp) {
-            const response = await fetch('http://54.79.93.12/api/getuser', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: userId })
-            });
-            data = await response.json();
-            chrome.storage.sync.set({ cachedUserData: data })
-        } else {
-            const { cachedUserData } = await chrome.storage.sync.get(['cachedUserData']);
-            data = cachedUserData;
-        }
+        const data = await response.json();
+        const body = document.body;
 
         if (!params && data.result && new Date().valueOf() < data.result.expires) {
             cssToRemove = 'link[href="../css/login.css"]';

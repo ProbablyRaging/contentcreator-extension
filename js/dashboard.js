@@ -177,24 +177,6 @@ async function updateCurrentQueueList(res, userId, useCached) {
     }
 }
 
-async function updateUserTokensCount(userId, element) {
-    $.ajax({
-        url: 'http://54.79.93.12/api/usertokens',
-        type: 'POST',
-        data: {
-            userId: userId,
-        },
-        success: function (res) {
-            // Update current user tokens
-            element.innerText = res.tokens;
-        },
-        error: function () {
-            // This function will be called if there is an error fetching the data
-            console.log('Error fetching data.');
-        }
-    });
-}
-
 function numberWithCommas(x) {
     if (x >= 1000000) {
         return (x / 1000000).toFixed(1) + 'M';
@@ -258,7 +240,6 @@ async function setupDashboardPage() {
         updateTotalWatchCount(null, true);
         startVideoExpireTimer(null, true);
         updateCurrentQueueList(null, userId, true);
-        updateUserTokensCount(userId, tokenData);
     }
 
     // If there is already an active queue window, disable the play queue button
@@ -444,7 +425,7 @@ async function setupDashboardPage() {
     // When the logout button is clicked
     logoutBtn.addEventListener('click', async function () {
         $.ajax({
-            url: 'http://54.79.93.12/api/logout',
+            url: 'http://lo/api/logout',
             type: 'POST',
             data: {
                 userId: userId,
