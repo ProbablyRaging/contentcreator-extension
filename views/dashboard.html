@@ -1,123 +1,49 @@
 <body>
+    <div class="body-bg"></div>
     <div id="dashboardFadeIn" class="dashboard">
-        <div class="title">
-            <p class="title-welcome">Welcome, data.result.username</p>
+        <div class="header">
+            <p class="title">Dashboard</p>
+            <img id="userAvatar" src="../assets/images/default-user.png">
         </div>
 
-        <i id="settingsBtn" class="bi bi-gear-fill settings-btn"></i>
-
-        <p id="timeToReset" class="container-body queue-countdown">You don't have a video in the queue</p>
-
-        <div class="play-button">
-            <button id="button" class="ready">
-                <div class="message submitMessage">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13 12.2">
-                        <polyline stroke="currentColor" points="2,7.1 6.5,11.1 11,7.1 " />
-                        <line stroke="currentColor" x1="6.5" y1="1.2" x2="6.5" y2="10.3" />
-                    </svg>
-                    <span class="button-text">Play Queue</span>
+        <button id="playQueueBtn" class="flex-container">
+            <div class="container-content">
+                <div class="container-title">
+                    <span id="queueStatus">Play Queue</span>
                 </div>
-                <div class="message loadingMessage">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 17">
-                        <circle class="loadingCircle" cx="2.2" cy="10" r="1.6" />
-                        <circle class="loadingCircle" cx="9.5" cy="10" r="1.6" />
-                        <circle class="loadingCircle" cx="16.8" cy="10" r="1.6" />
-                    </svg>
+                <div class="container-body">
+                    <span id="videoListCount">0 <i class="bi bi-camera-video-fill"></i></span>
+                    <span id="watchCount">0 <i class="bi bi bi-eye-fill"></i></span>
                 </div>
-                <div class="message successMessage">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13 11">
-                        <polyline stroke="currentColor" points="1.4,5.8 5.1,9.5 11.6,2.1 " />
-                    </svg>
-                    <span class="button-text">Queue Playing</span>
+                <div class="container-footer">
+                    <span id="expireCountdown">No video in the queue</span>
                 </div>
-            </button>
-            <canvas id="canvas"></canvas>
+            </div>
+            <span class="play-button"><i class="bi bi bi-play-fill"></i></span>
+        </button>
+
+        <div class="sub-header">
+            <span id="currentQueue">Current Queue (0)</span>
         </div>
-
-        <div class="content-container">
-            <p id="watchCount" class="container-body-lg">video views today</p>
-        </div>
-
-        <div id="accordian">
-            <h3 id="list-title">Current Queue (0) <i class="bi bi-caret-down-fill accordian-caret"></i></h3>
-            <ul class="unordered-list">
-                <li id="videoList" class="video-list">
-                </li>
-            </ul>
-        </div>
-
-        <div class="footer">
-            <div id="logoutBtn" class="footer-btn logout" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Logout">
-                <i class="bi bi-arrow-return-left"></i>
-            </div>
-
-            <p id="input-error" class="input-error"></p>
-            <input id="createInput" type="text" placeholder="Enter video URL or ID"></input>
-
-            <div id="createBtn" class="footer-btn" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Submit Video">
-                <i class="bi bi-plus-lg"></i>
-            </div>
-            <div id="statsBtn" class="footer-btn" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Statistics">
-                <i class="bi bi-bar-chart"></i>
-            </div>
-            <div id="sendCreateBtn" class="footer-btn hidden">
-                <i class="bi bi-send-fill"></i>
-            </div>
-            <div id="endCreateBtn" class="footer-btn">
-                <i class="bi bi-x-lg"></i>
-            </div>
-
-            <div id="currencyBlob" class="currency">
-                <div class="blob">
-                    <p id="tokenData" class="tokens-data">data.result.tokens</p> <img src="../assets/images/tokens.png">
+        <div class="flex-container-alt">
+            <div class="container-content">
+                <div class="video-list">
                 </div>
             </div>
         </div>
     </div>
-    <div id="settingsMenu" class="settings-menu">
-        <div class="settings-container">
-            <div class="settings-div">
-                <div class="settings-wrapper">
-                    <div class="switch-wrapper">
-                        <p class="switch-label">Notifications <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Receive a notification when you're eligible to submit a video"></i></p>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="notificationsSwitch">
-                        </div>
-                    </div>
-                    <div id="notificationsAlt" class="notifications-alt">
-                        <div class="switch-wrapper">
-                            <p class="switch-label">Discord <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Receive notifications via Discord"></i></p>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="discordSwitch">
-                            </div>
-                        </div>
-                        <div class="switch-wrapper">
-                            <p class="switch-label">Browser <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Receive notifications via browser"></i></p>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="browserSwitch">
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="div-divider"></div>
-
-                    <div class="switch-wrapper">
-                        <p class="switch-label">Mute Queue Window <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Play videos with no sound"></i></p>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="muteQueueSwitch">
-                        </div>
-                    </div>
-
-                    <div class="div-divider"></div>
-
-                    <div class="switch-wrapper">
-                        <p class="switch-label">Play Full Video <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Play videos for the full length"></i></p>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="playFullSwitch">
-                        </div>
-                    </div>
-                </div>
+    <div class="nav-panel">
+        <button id="addBtn" class="main-btn"><i class="bi bi-plus"></i></button>
+        <div class="sub-buttons">
+            <div class="sub-buttons-l">
+                <i id="dashboardNavBtn" class="bi bi bi-house-door nav-button active"></i>
+                <i id="statisticsNavBtn" class="bi bi bi-bar-chart nav-button"></i>
             </div>
-            <p id="extInfo" class="ext-info">Version 1.3.4</p>
+            <div class="sub-buttons-r">
+                <i id="settingsNavBtn" class="bi bi bi-gear nav-button"></i>
+                <i id="logoutNavBtn" class="bi bi bi-door-closed nav-button logout-btn"></i>
+            </div>
         </div>
+    </div>
 </body>

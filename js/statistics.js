@@ -17,6 +17,12 @@ function checkStatsPage() {
     reCheck();
 }
 
+async function setUserAvatar() {
+    const userAvatar = document.getElementById('userAvatar');
+    const { userAvatarUrl } = await chrome.storage.sync.get(['userAvatarUrl']);
+    userAvatar.src = userAvatarUrl;
+}
+
 function numberWithCommas(x) {
     if (x >= 1000000) {
         return (x / 1000000).toFixed(1) + 'M';
@@ -27,50 +33,38 @@ function numberWithCommas(x) {
     }
 }
 
-function setupStatsPage() {
-    const dashboard = document.getElementById('dashboardFadeIn');
-    $(dashboard).animate({ opacity: 1 }, 300);
-
+async function setupStatsPage() {
+    // Fade out and replace background
+    $('.body-bg').css('background-image', 'url("../assets/images/nav-panel.svg")')
+        .css('background-position-y', '78px')
+        .css('background-size', 'cover')
+        .css('background-color', '#f7f7f7')
+        .css('opacity', '1')
     setTimeout(() => {
-        $('.title-welcome').animate({ opacity: 1 }, 200);
-    }, 470);
-
-    setTimeout(() => {
-        $('.stats-box').animate({ opacity: 1 }, 300);
-        $('.footer').animate({ opacity: 1 }, 300);
-    }, 770);
-
-    setTimeout(() => {
-        $('.stats-number').each(function () {
-            const $this = $(this);
-            const targetValue = parseInt($this.text());
-            $this.text('0');
-            $({ countNum: 0 }).animate(
-                { countNum: targetValue },
-                {
-                    duration: 1000,
-                    easing: 'linear',
-                    step: function () {
-                        $this.text(numberWithCommas(this.countNum.toFixed(0)));
-                    },
-                    complete: function () {
-                        $this.text(numberWithCommas(targetValue));
-                    },
-                }
-            );
-        });
-    }, 600);
-
-    const returnBtn = document.getElementById('returnBtn');
-
-    // When the refresh button is clicked, redirect to the loader.html page
-    returnBtn.addEventListener('click', function () {
-        $('.title-welcome').animate({ opacity: 0 }, 200);
-        setTimeout(() => {
-            $('.body-bg').animate({ 'background-position-y': '-90px' }, 300);
-            $('body').animate({ opacity: 0 }, 300).promise().then(() => {
-                window.location = '../views/loader.html';
+        $('.body-bg').animate({ backgroundPositionY: '0px' }, 300)
+            .promise().then(() => {
+                $('.main-btn').animate({ opacity: 1 }, 300);
+                $('.dashboard').animate({ opacity: 1 }, 300);
             });
-        }, 200);
+        $('.sub-buttons').animate({ bottom: '24px' }, 300);
+    }, 300);
+
+    const { userId } = await chrome.storage.sync.get(['userId']);
+
+    // Add event listeners to nav buttons
+    const navButtons = [
+        document.getElementById('dashboardNavBtn'),
+        document.getElementById('statisticsNavBtn'),
+        document.getElementById('settingsNavBtn'),
+        document.getElementById('logoutNavBtn'),
+    ];
+    navButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const buttonName = button.getAttribute('id');
+            reactToNavButton(userId, buttonName);
+        });
     });
+
+    // Set user avatar
+    setUserAvatar();
 }

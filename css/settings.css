@@ -1,0 +1,97 @@
+.settings-menu {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    background-color: #000c14;
+    top: 568px;
+    left: 0;
+    font-size: 14px;
+    width: 100%;
+    height: 100%;
+    margin: 33px 0;
+    box-shadow: 0 -3px 20px #00000082;
+    border-top: 4px solid rgb(1 20 32);
+    border-radius: 16px;
+    z-index: 999;
+}
+
+.settings-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 10px;
+    width: 100%;
+    height: fit-content;
+}
+
+.settings-div {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.settings-wrapper {
+    width: 100%;
+}
+
+.ext-info {
+    position: absolute;
+    bottom: 100;
+    color: #b3b3b3;
+    font-size: 10px;
+    text-align: center;
+    width: 80%;
+}
+
+.switch-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 36px;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.switch-wrapper .bi {
+    margin-left: 6px;
+    font-size: 12px;
+    color: rgb(150, 150, 150);
+    cursor: default;
+}
+
+.switch-label {
+    display: flex;
+    align-items: center;
+}
+
+.notifications-alt .switch-label {
+    margin-left: 18px;
+}
+
+.form-check {
+    min-height: 0;
+}
+
+.form-check-input {
+    cursor: pointer;
+    border: 1px solid #7c859b;
+    background-color: #ffffff0d;
+    height: 16px;
+    width: 34px !important;
+}
+
+.form-check-input:focus {
+    box-shadow: none;
+    border-color: #7c859b;
+}
+
+.form-check-input:checked {
+    background-color: #ffffff0d;
+    border-color: #6c43ff;
+    background-image: url('../assets/images/button-inner.svg') !important;
+}
+
+.form-switch .form-check-input {
+    background-image: url('../assets/images/button-inner-disabled.svg');
+}

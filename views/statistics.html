@@ -1,25 +1,44 @@
 <body>
     <div id="dashboardFadeIn" class="dashboard">
-        <div class="title">
-            <p class="title-welcome">Your Statistics</p>
+        <div class="header">
+            <p class="title">Statistics</p>
+            <img id="userAvatar" src="../assets/images/default-user.png">
         </div>
 
-        <div class="stats-box">
-            <p class="stats-text">You have submitted <span class="stats-number">data.result.submissions</span> video(s)</p>
-            <p class="stats-text">Your video(s) have received <span class="stats-number">data.result.views</span> view(s)</p>
-            <p class="stats-text">Your video(s) have received <span class="stats-number">data.result.likes</span> like(s)</p>
-            <p class="stats-text">You have watched <span class="stats-number">data.result.watches</span> video(s)</p>
-        </div>
-
-        <div class="footer">
-            <div id="returnBtn" class="footer-btn return">
-                <i class="bi bi-arrow-left"></i>
-            </div>
-
-            <div id="currencyBlob" class="currency">
-                <div class="blob">
-                    <p id="tokenData" class="tokens-data">data.result.tokens</p> <img src="../assets/images/tokens.png">
+        <div class="flex-container-alt">
+            <div class="container-content">
+                <div class="stats-list">
+                    <div class="stats-item">
+                        <span>Submissions</span>
+                        <span class="stats-number">3</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>Views</span>
+                        <span class="stats-number">98</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>Likes</span>
+                        <span class="stats-number">34</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>Videos Watched</span>
+                        <span class="stats-number">247</span>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-panel">
+        <button id="addBtn" class="main-btn"><i class="bi bi-plus"></i></button>
+        <div class="sub-buttons">
+            <div class="sub-buttons-l">
+                <i id="dashboardNavBtn" class="bi bi bi-house-door nav-button"></i>
+                <i id="statisticsNavBtn" class="bi bi bi-bar-chart nav-button active"></i>
+            </div>
+            <div class="sub-buttons-r">
+                <i id="settingsNavBtn" class="bi bi bi-gear nav-button"></i>
+                <i id="logoutNavBtn" class="bi bi bi-door-closed nav-button logout-btn"></i>
             </div>
         </div>
     </div>

@@ -1,7 +1,23 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    chrome.action.setBadgeText({ text: '' });
     const urlParams = new URLSearchParams(window.location.search);
     const params = urlParams.get('data');
+
+    if (params) {
+        setTimeout(() => {
+            $('body').css('background-image', 'none')
+                .promise().then(() => {
+                    $('.body-bg').css('opacity', '1')
+                        .promise().then(() => {
+                            $('body').animate({ opacity: 1 }, 300)
+                        });
+                });
+        }, 100);
+    } else {
+        $('body').css('background-image', 'linear-gradient(40deg, #6c43ff, #9364fe)')
+        $('body').css('opacity', '1')
+    }
+
+    chrome.action.setBadgeText({ text: '' });
     // Check if user has an active session
     const { userId } = await chrome.storage.sync.get(['userId']);
     setTimeout(async () => {
@@ -14,12 +30,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const data = await response.json();
         const body = document.body;
 
-        if (!params && data.result && new Date().valueOf() < data.result.expires) {
+        if ((!params || params === 'dashboardNavBtn') && data.result && new Date().valueOf() < data.result.expires) {
             cssToRemove = 'link[href="../css/login.css"]';
             viewPage = '../views/dashboard.html';
-        } else if (params === 'statistics') {
+        } else if (params === 'statisticsNavBtn') {
             cssToRemove = 'link[href="../css/login.css"]';
             viewPage = '../views/statistics.html';
+        } else if (params === 'settingsNavBtn') {
+            cssToRemove = 'link[href="../css/login.css"]';
+            viewPage = '../views/settings.html';
         } else {
             cssToRemove = 'link[href="../css/dashboard.css"]';
             viewPage = '../views/login.html';
@@ -54,9 +73,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                         $('page-content').html(newBody);
                         $('page-content').attr('page', 'statistics');
                     }
+                    if (viewPage.includes('settings')) {
+                        $('page-content').html(newBody);
+                        $('page-content').attr('page', 'settings');
+                    }
                     $(body).animate({ opacity: 1 }, 300);
                 }
             });
         });
-    }, 700);
+    }, params ? 300 : 700);
 });
