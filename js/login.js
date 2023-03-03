@@ -44,4 +44,9 @@ function setupLoginPage() {
             authButton.disabled = false;
         }
     });
+
+    const discordJoin = document.getElementById('discordJoin');
+    discordJoin.addEventListener('click', function () {
+        chrome.tabs.create({ url: 'https://discord.gg/forthecontent' });
+    });
 }
