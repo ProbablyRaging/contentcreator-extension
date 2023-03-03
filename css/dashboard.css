@@ -30,9 +30,43 @@
     box-shadow: 0 0 8px #00000071;
 }
 
+.header-r {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .title {
     font-size: 24px;
     font-weight: 700;
+}
+
+.token-count {
+    display: flex;
+    width: fit-content;
+    height: 34px;
+    padding: 0 10px;
+    background-color: #ffffff;
+    border-radius: 417px;
+    color: #000;
+    font-size: 18px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+    user-select: none;
+    box-shadow: 0 0 10px #0000002e;
+}
+
+.token-count img {
+    width: 16px;
+    height: 16px;
+    border-radius: none;
+    box-shadow: none;
+}
+
+.token-count .bi {
+    font-size: 14px;
 }
 
 .sub-header {
@@ -64,11 +98,11 @@
 }
 
 .flex-container:disabled {
-    background-color: #7466a7b8;
+    background-color: #58a75a;
 }
 
 .flex-container:disabled:hover {
-    background-color: #7466a7b8;
+    background-color: #58a75a;
     transform: none;
 }
 
@@ -149,6 +183,54 @@
     border-bottom: 1px solid #e5e5e5;
 }
 
+.input-sub-header {
+    opacity: 0;
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    bottom: 150px;
+    width: 94%;
+    margin-top: 32px;
+    color: #9d9d9d;
+}
+
+.input-container {
+    opacity: 0;
+    display: flex;
+    position: absolute;
+    bottom: 105px;
+    width: 94%;
+}
+
+.input-container input {
+    opacity: 0;
+    align-items: center;
+    width: 100%;
+    height: 34px;
+    color: #000;
+    background-color: #ffffff;
+    border-radius: 100px;
+    margin-top: 12px;
+    padding: 0 16px;
+    border: 1px solid #9d9d9d;
+    box-shadow: 2px 2px 8px #0000002e;
+}
+
+.input-container input:focus-visible {
+    outline: none;
+    border: 1px solid #606060;
+}
+
+input.success::placeholder {
+    color: #58a75a;
+    font-weight: 700;
+}
+
+input.error::placeholder {
+    color: #d96c6e;
+    font-weight: 700;
+}
+
 .nav-panel {
     display: flex;
     position: absolute;
@@ -157,16 +239,12 @@
     height: 100px;
 }
 
-.nav-panel .bi-plus {
-    font-size: 38px;
-    color: #fff;
-}
-
 .main-btn {
     opacity: 0;
     width: 56px;
     height: 56px;
     position: absolute;
+    bottom: 28px;
     left: 152px;
     border-radius: 100px;
     border: none;
@@ -174,6 +252,11 @@
     box-shadow: 0 0 10px #000000a3;
     z-index: 1;
     transition: background-color 0.1s ease, transform 0.1s ease;
+}
+
+.main-btn .bi {
+    font-size: 38px;
+    color: #fff;
 }
 
 .main-btn:hover {

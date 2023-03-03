@@ -2,11 +2,14 @@
     <div id="dashboardFadeIn" class="dashboard">
         <div class="header">
             <p class="title">Settings</p>
-            <img id="userAvatar" src="../assets/images/default-user.png">
+            <div class="header-r">
+                <span id="tokenCount" class="token-count">data.result.tokens <img class="token-img" src="../assets/images/tokens.png"></span>
+                <img id="userAvatar" src="https://cdn.discordapp.com/avatars/data.result.userId/data.result.avatar.webp?size=256" onerror="this.src='../assets/images/default-avatar.png';">
+            </div>
         </div>
 
         <div class="flex-container-alt">
-            <div class="container-content">
+            <div class="container-content settings-content">
                 <div class="settings-container">
                     <div class="settings-div">
                         <div class="settings-wrapper">
@@ -55,19 +58,27 @@
             </div>
         </div>
 
+        <p id="helpLink" class="help-link">Need help?</p>
 
+        <div class="sub-header input-sub-header">
+            <span id="submitVideo">Submit Video</span>
+        </div>
+        <div class="input-container">
+            <input id="submitInput" type="text" placeholder="Enter video URL or ID"></input>
+        </div>
+    </div>
 
-        <div class="nav-panel">
-            <button id="addBtn" class="main-btn"><i class="bi bi-plus"></i></button>
-            <div class="sub-buttons">
-                <div class="sub-buttons-l">
-                    <i id="dashboardNavBtn" class="bi bi bi-house-door nav-button"></i>
-                    <i id="statisticsNavBtn" class="bi bi bi-bar-chart nav-button"></i>
-                </div>
-                <div class="sub-buttons-r">
-                    <i id="settingsNavBtn" class="bi bi bi-gear nav-button active"></i>
-                    <i id="logoutNavBtn" class="bi bi bi-door-closed nav-button logout-btn"></i>
-                </div>
+    <div class="nav-panel">
+        <button id="submitVideoBtn" class="main-btn"><i class="bi bi-plus"></i></button>
+        <div class="sub-buttons">
+            <div class="sub-buttons-l">
+                <i id="dashboardNavBtn" class="bi bi bi-house-door nav-button"></i>
+                <i id="statisticsNavBtn" class="bi bi bi-bar-chart nav-button"></i>
+            </div>
+            <div class="sub-buttons-r">
+                <i id="settingsNavBtn" class="bi bi bi-gear nav-button active"></i>
+                <i id="logoutNavBtn" class="bi bi bi-door-closed nav-button logout-btn"></i>
             </div>
         </div>
+    </div>
 </body>

@@ -5,6 +5,7 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
     }
     // Check if an ad is playing
     if (message.checkForAds) {
+        console.log(`2`, message.tabId);
         checkIfAdPlaying(message.tabId, message.reversed);
     }
     // Block tab interaction
@@ -21,14 +22,20 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
     }
 });
 
+let likeButtonRetries = 0;
 function findAndClickLikeButton(tabId, videoId) {
+    console.log(`3`, tabId);
+    if (likeButtonRetries >= 30) return;
     const likeButton = document.querySelector('[aria-label*="like this video along with"]');
     if (likeButton) {
         likeButton.click();
         chrome.runtime.sendMessage({ videoLiked: true, tabId: tabId, videoId: videoId });
     } else {
         // If the like button is not found, wait amd try again
-        setTimeout(findAndClickLikeButton, 1000);
+        setTimeout(() => {
+            findAndClickLikeButton(tabId, videoId);
+            likeButtonRetries++;
+        }, 1000);
     }
 }
 
@@ -159,6 +166,8 @@ function preventPausingVideos() {
                         const newButtonState = document.querySelector('.ytp-play-button').getAttribute('data-title-no-tooltip');
                         if (!playStateChecked && newButtonState === 'Play') {
                             AddTextToBlocker();
+                            playStateChecked = true;
+                        } else {
                             playStateChecked = true;
                         }
                     }, 1000);

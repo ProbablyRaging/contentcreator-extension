@@ -1,3 +1,18 @@
+function numberWithCommas(x) {
+    const integerPart = Math.floor(x).toString();
+    const numCommas = Math.max(0, Math.floor((integerPart.length - 1) / 3));
+    let result = '';
+    for (let i = 1; i <= numCommas; i++) {
+        const commaPos = integerPart.length - i * 3;
+        result = ',' + integerPart.substring(commaPos, commaPos + 3) + result;
+    }
+    result = integerPart.substring(0, integerPart.length - numCommas * 3) + result;
+    if (x % 1 !== 0) {
+        result += x.toFixed(2).substring(integerPart.length + 1);
+    }
+    return result;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const params = urlParams.get('data');
@@ -59,21 +74,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                         $('page-content').attr('page', 'login');
                     }
                     if (viewPage.includes('dashboard')) {
-                        newBody = newBody.replace('data.result.username', data.result.username);
+                        newBody = newBody.replace('data.result.userId', data.result.userId);
+                        newBody = newBody.replace('data.result.avatar', data.avatar);
                         newBody = newBody.replace('data.result.tokens', data.result.tokens || 0);
                         $('page-content').html(newBody);
                         $('page-content').attr('page', 'dashboard');
                     }
                     if (viewPage.includes('statistics')) {
+                        newBody = newBody.replace('data.result.userId', data.result.userId);
+                        newBody = newBody.replace('data.result.avatar', data.avatar);
                         newBody = newBody.replace('data.result.tokens', data.result.tokens || 0);
-                        newBody = newBody.replace('data.result.submissions', data.result.submissions || 0);
-                        newBody = newBody.replace('data.result.views', data.result.views || 0);
-                        newBody = newBody.replace('data.result.likes', data.result.likes || 0);
-                        newBody = newBody.replace('data.result.watches', data.result.watches || 0);
+                        newBody = newBody.replace('data.result.submissions', numberWithCommas(data.result.submissions) || 0);
+                        newBody = newBody.replace('data.result.views', numberWithCommas(data.result.views) || 0);
+                        newBody = newBody.replace('data.result.likes', numberWithCommas(data.result.likes) || 0);
+                        newBody = newBody.replace('data.result.watches', numberWithCommas(data.result.watches) || 0);
+                        newBody = newBody.replace('data.result.earned', numberWithCommas((data.result.submissions * 5) + data.result.tokens) || 0);
                         $('page-content').html(newBody);
                         $('page-content').attr('page', 'statistics');
                     }
                     if (viewPage.includes('settings')) {
+                        newBody = newBody.replace('data.result.userId', data.result.userId);
+                        newBody = newBody.replace('data.result.avatar', data.avatar);
+                        newBody = newBody.replace('data.result.tokens', data.result.tokens || 0);
                         $('page-content').html(newBody);
                         $('page-content').attr('page', 'settings');
                     }

@@ -3,7 +3,10 @@
     <div id="dashboardFadeIn" class="dashboard">
         <div class="header">
             <p class="title">Dashboard</p>
-            <img id="userAvatar" src="../assets/images/default-user.png">
+            <div class="header-r">
+                <span id="tokenCount" class="token-count">data.result.tokens <img class="token-img" src="../assets/images/tokens.png"></span>
+                <img id="userAvatar" src="https://cdn.discordapp.com/avatars/data.result.userId/data.result.avatar.webp?size=256" onerror="this.src='../assets/images/default-avatar.png';">
+            </div>
         </div>
 
         <button id="playQueueBtn" class="flex-container">
@@ -26,15 +29,22 @@
             <span id="currentQueue">Current Queue (0)</span>
         </div>
         <div class="flex-container-alt">
-            <div class="container-content">
+            <div id="videoListContainer" class="container-content">
                 <div class="video-list">
                 </div>
             </div>
         </div>
+
+        <div class="sub-header input-sub-header">
+            <span id="submitVideo">Submit Video</span>
+        </div>
+        <div class="input-container">
+            <input id="submitInput" type="text" placeholder="Enter video URL or ID"></input>
+        </div>
     </div>
 
     <div class="nav-panel">
-        <button id="addBtn" class="main-btn"><i class="bi bi-plus"></i></button>
+        <button id="submitVideoBtn" class="main-btn"><i class="bi bi-plus"></i></button>
         <div class="sub-buttons">
             <div class="sub-buttons-l">
                 <i id="dashboardNavBtn" class="bi bi bi-house-door nav-button active"></i>
@@ -46,4 +56,26 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="updateModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div update="1.4.5" class="modal-header">
+                    <div class="title-wrapper">
+                        <h1 class="modal-title fs-5">title</h1>
+                        <p class="modal-date">date</p>
+                    </div>
+                    <button type="button" class="bi bi-x btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h2 class="added">h2 added</h2>
+                    body
+                </div>
+                <div class="modal-footer">
+                    Close
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade"></div>
 </body>

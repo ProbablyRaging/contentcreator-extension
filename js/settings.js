@@ -25,19 +25,7 @@ async function setUserAvatar() {
 
 async function setupSettingsPage() {
     // Fade out and replace background
-    $('.body-bg').css('background-image', 'url("../assets/images/nav-panel.svg")')
-        .css('background-position-y', '78px')
-        .css('background-size', 'cover')
-        .css('background-color', '#f7f7f7')
-        .css('opacity', '1')
-    setTimeout(() => {
-        $('.body-bg').animate({ backgroundPositionY: '0px' }, 300)
-            .promise().then(() => {
-                $('.main-btn').animate({ opacity: 1 }, 300);
-                $('.dashboard').animate({ opacity: 1 }, 300);
-            });
-        $('.sub-buttons').animate({ bottom: '24px' }, 300);
-    }, 300);
+    fadeInNavBar();
 
     const { notifications } = await chrome.storage.sync.get(['notifications']);
     const { discordNotification } = await chrome.storage.sync.get(['discordNotification']);
@@ -69,6 +57,37 @@ async function setupSettingsPage() {
 
     // Set user avatar
     setUserAvatar();
+
+    // When a user clicks the submit video button
+    const submitVideoBtn = document.getElementById('submitVideoBtn');
+    submitVideoBtn.addEventListener('click', function () {
+        presentVideoSubmissionInput(userId, submitVideoBtn);
+    });
+
+    // When the text input state changes
+    const submitInput = document.getElementById('submitInput');
+    let delayCheck;
+    submitInput.addEventListener('input', function () {
+        clearTimeout(delayCheck);
+        delayCheck = setTimeout(function () {
+            if (submitInput.value.length > 0) {
+                $(submitVideoBtn).animate({ 'rotate': '0deg' }, 200)
+                    .promise().then(() => {
+                        $(submitVideoBtn).html('<i class="bi bi-check-lg"></i>')
+                            .css('background-color', '#30c974')
+                            .html('<i class="bi bi-check"></i>')
+                            .toggleClass('active')
+                            .toggleClass('submit');
+                    });
+            } else {
+                $(submitVideoBtn).animate({ 'rotate': '135deg' }, 200)
+                    .html('<i class="bi bi-plus"></i>')
+                    .css('background-color', '#ff3e3e')
+                    .toggleClass('active')
+                    .toggleClass('submit');
+            }
+        }, 300);
+    });
 
     // Settings switches
     if (notifications) {
@@ -128,6 +147,11 @@ async function setupSettingsPage() {
                 await chrome.storage.sync.set({ playFull: true });
             }
         });
+    });
+
+    const helpLink = document.getElementById('helpLink');
+    helpLink.addEventListener('click', function () {
+        chrome.tabs.create({ url: chrome.runtime.getURL('../views/help.html') });
     });
 
     // Get OS and extension version

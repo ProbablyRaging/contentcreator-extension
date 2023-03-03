@@ -78,11 +78,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             // Store the queue window ID for checking later
             chrome.storage.sync.set({ activeWindowId: window.id });
             initWindowId = window.id;
-            // Check browser type and determine delay
-            const delaySecondTab = navigator.userAgent.includes('Chrome') ? 15000 : 7000;
             // Stop executing if the window is closed
             if (chrome.runtime.lastError) return;
-            createQueueWindow(window, delaySecondTab);
+            createQueueWindow(window, 7000);
         });
     }
     // If a video duration is available
@@ -93,6 +91,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
     // If the like but was clicked successfully
     if (message.videoLiked) {
+        console.log(`3`, message.tabId);
         incrementLikeCount(message.tabId, message.videoId);
     }
     // If the user isn't signed in to youtube
@@ -457,6 +456,7 @@ function incrementWatchCount(tabId, videoId) {
 }
 
 function incrementLikeCount(tabId, videoId) {
+    console.log(`1`, tabId);
     // Check if the tab is still open
     chrome.tabs.get(tabId, async function (tab) {
         if (chrome.runtime.lastError) return;

@@ -25,6 +25,10 @@
     height: fit-content;
 }
 
+.settings-content {
+    max-height: 382px !important;
+}
+
 .settings-div {
     display: flex;
     justify-content: center;
@@ -94,4 +98,9 @@
 
 .form-switch .form-check-input {
     background-image: url('../assets/images/button-inner-disabled.svg');
+}
+
+.help-link {
+    color: #6c43ff;
+    cursor: pointer;
 }

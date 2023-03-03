@@ -1,3 +1,7 @@
+.stats-content {
+    max-height: 382px !important;
+}
+
 .stats-list {
     display: flex;
     flex-direction: column;
