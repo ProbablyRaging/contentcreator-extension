@@ -81,7 +81,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             // Stop executing if the window is closed
             if (chrome.runtime.lastError) return;
             // Play queue
-            createQueueWindow(window, 7000);
+            createQueueWindow(window, 10000);
             // Start watch timer
             startWatchTimer();
         });
