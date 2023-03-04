@@ -90,9 +90,9 @@ async function populateVideoListContainer(userId, videoList, useCached) {
         $.each(cachedVideoData.videoList, function (index, item) {
             // For each item in the data, we create a new list item and add it to the list
             const listItem = $('<div class="video-item">')
-                .html(`<span id="index">${index + 1}</span>
-                <span id="videoUrl"><a href="https://youtu.be/${item.videoId}" target="_blank">youtu.be/${item.videoId}</a></span>
-                <span id="videoViews" ${userId === item.userId ? 'style="color: #6c43ff;"' : ''}><i class="bi bi bi-eye-fill"></i> ${item.watches}</span>`)
+                .html(`<span id="index" ${userId === item.userId ? 'style="color: #6c43ff; font-weight: 700"' : ''}>${index + 1}</span>
+                <span id="videoUrl" ${userId === item.userId ? 'style="color: #6c43ff; font-weight: 600"' : ''}><a href="https://youtu.be/${item.videoId}" target="_blank">youtu.be/${item.videoId}</a></span>
+                <span id="videoViews" ${userId === item.userId ? 'style="color: #6c43ff; font-weight: 700"' : ''}><i class="bi bi bi-eye-fill"></i> ${item.watches}</span>`)
             // `${userId === item.userId ? '<i class="bi bi-caret-right-fill" style="color: #5d93cb;"></i>' : ''} ${index + 1}`
             // Append formatted item to list
             emptyList.append(listItem);
@@ -108,9 +108,9 @@ async function populateVideoListContainer(userId, videoList, useCached) {
             if (userId === item.userId) startVideoExpireTimer(item.expires);
             // For each item in the data, we create a new list item and add it to the list
             const listItem = $('<div class="video-item">')
-                .html(`<span id="index">${index + 1}</span>
-                <span id="videoUrl"><a href="https://youtu.be/${item.videoId}" target="_blank">youtu.be/${item.videoId}</a></span>
-                <span id="videoViews" ${userId === item.userId ? 'style="color: #6c43ff;"' : ''}><i class="bi bi bi-eye-fill"></i> ${item.watches}</span>`)
+                .html(`<span id="index" ${userId === item.userId ? 'style="color: #6c43ff; font-weight: 700"' : ''}>${index + 1}</span>
+                <span id="videoUrl" ${userId === item.userId ? 'style="color: #6c43ff; font-weight: 600"' : ''}><a href="https://youtu.be/${item.videoId}" target="_blank">youtu.be/${item.videoId}</a></span>
+                <span id="videoViews" ${userId === item.userId ? 'style="color: #6c43ff; font-weight: 700"' : ''}><i class="bi bi bi-eye-fill"></i> ${item.watches}</span>`)
             // `${userId === item.userId ? '<i class="bi bi-caret-right-fill" style="color: #5d93cb;"></i>' : ''} ${index + 1}`
             // Append formatted item to list
             emptyList.append(listItem);

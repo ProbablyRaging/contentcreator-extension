@@ -33,17 +33,22 @@ function fetchUserDataAndPopulateLeaderboards(userId) {
 }
 
 async function populateLeaderboard(userId, data, className, useCached) {
+    if (className === 'watches') bsIcon = 'bi-fire';
+    if (className === 'views') bsIcon = 'bi-eye-fill';
+    if (className === 'likes') bsIcon = 'bi-hand-thumbs-up-fill';
+    let actualIndex = 0;
     if (useCached) {
         const list = $(`.${className}-lb-list`);
         $.each(data.slice(0, 50), function (index, item) {
             if (item.userId === '837447568422076456' || item.userId === '1003256013434134548') return;
             // For each item in the data, we create a new list item and add it to the list
             const listItem = $('<div class="video-item">')
-                .html(`<span id="index">${index + 1}</span>
-                        <span id="username">${item.username}</span>
-                        <span id="watches" ${userId === item.userId ? 'style="color: #6c43ff;"' : ''}><i class="bi bi bi-eye-fill"></i> ${item[className] || 0}</span>`);
+                .html(`<span id="index" ${userId === item.userId ? 'style="color: #6c43ff; font-weight: 700"' : ''}>${actualIndex + 1}</span>
+                        <span id="username" ${userId === item.userId ? 'style="color: #6c43ff; font-weight: 700"' : ''}>${item.username}</span>
+                        <span id="watches" ${userId === item.userId ? 'style="color: #6c43ff; font-weight: 700"' : ''}><i class="bi ${bsIcon}"></i> ${item[className] || 0}</span>`);
             // Append formatted item to list
             list.append(listItem);
+            actualIndex++;
         });
         // Finally, we append the list to a container element in the HTML
         $(`.${className}-lb-list`).append(list);
@@ -53,11 +58,12 @@ async function populateLeaderboard(userId, data, className, useCached) {
             if (item.userId === '837447568422076456' || item.userId === '1003256013434134548') return;
             // For each item in the data, we create a new list item and add it to the list
             const listItem = $('<div class="video-item">')
-                .html(`<span id="index">${index + 1}</span>
-                        <span id="username">${item.username}</span>
-                        <span id="watches" ${userId === item.userId ? 'style="color: #6c43ff;"' : ''}><i class="bi bi bi-eye-fill"></i> ${item[className] || 0}</span>`);
+                .html(`<span id="index" ${userId === item.userId ? 'style="color: #6c43ff; font-weight: 700"' : ''}>${actualIndex + 1}</span>
+                        <span id="username" ${userId === item.userId ? 'style="color: #6c43ff; font-weight: 700"' : ''}>${item.username}</span>
+                        <span id="watches" ${userId === item.userId ? 'style="color: #6c43ff; font-weight: 700"' : ''}><i class="bi ${bsIcon}"></i> ${item[className] || 0}</span>`);
             // Append formatted item to list
             list.append(listItem);
+            actualIndex++;
         });
         // Finally, we append the list to a container element in the HTML
         $(`.${className}-lb-list`).append(list);
