@@ -133,7 +133,7 @@ async function setupSettingsPage() {
         });
     });
     playLengthValue ? playLengthRange.value = playLengthValue : playLengthRange.value = 1;
-    playLength ? rangeValue.innerText = playLengthValue === '6' ? `Full Length` : `${playLength / 1000 / 60} minutes` : rangeValue.value = 10000;
+    playLength ? rangeValue.innerText = playLengthValue === '6' ? `Full Length` : `${playLength / 1000 / 60} minutes` : null;
     playLengthRange.addEventListener('input', function () {
         const plValue = playLengthRange.value;
         const values = [600000, 900000, 1200000, 1500000, 1800000, 'Full'];
