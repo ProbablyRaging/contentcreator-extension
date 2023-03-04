@@ -1,3 +1,7 @@
+page-content[page="statistics"] .header+.sub-header {
+    margin: 0;
+}
+
 .stats-content {
     max-height: 382px !important;
 }
@@ -16,8 +20,45 @@
 .stats-item:not(:last-of-type) {
     border-bottom: 1px solid #e5e5e5;
 }
+
 .stats-number {
     font-size: 16px;
     font-weight: 500;
     color: #6c43ff;
+}
+
+.btn-alt {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100px;
+    border: none;
+    padding: 12px 26px;
+    width: 200px;
+    color: #fff;
+    background-color: #6e44ff;
+    font-family: 'Roboto', Arial;
+    font-size: 14px;
+    font-weight: 500;
+    height: 40px;
+    margin-top: 16px;
+    box-shadow: 2px 2px 8px #0000002e;
+    transition: background-color 0.2s ease, transform 0.2s ease !important;
+}
+
+.btn-alt:hover {
+    background-color: #693eff;
+    border: none;
+    transform: scale(1.007);
+}
+
+.btn-alt:active,
+.btn-alt:focus-visible {
+    background-color: #693eff !important;
+    border: none;
+}
+
+.btn-alt:disabled {
+    background-color: #683eff81 !important;
+    border: none;
 }

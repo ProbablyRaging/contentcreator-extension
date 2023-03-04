@@ -139,8 +139,3 @@ input[type=range]::-webkit-slider-thumb {
 input[type=range]::-webkit-slider-thumb:active {
     background-color: #6c43ff;
 }
-
-.help-link {
-    color: #6c43ff;
-    cursor: pointer;
-}

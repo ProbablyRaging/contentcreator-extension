@@ -8,7 +8,7 @@ function numberWithCommas(x) {
     }
     result = integerPart.substring(0, integerPart.length - numCommas * 3) + result;
     if (x % 1 !== 0) {
-        result += x.toFixed(2).substring(integerPart.length + 1);
+        result += x?.toFixed(2).substring(integerPart.length + 1);
     }
     return result;
 }
@@ -53,6 +53,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (params === 'settingsNavBtn') {
         cssToRemove = 'link[href="../css/login.css"]';
         viewPage = '../views/settings.html';
+    } else if (params === 'leaderboardNavBtn') {
+        cssToRemove = 'link[href="../css/login.css"]';
+        viewPage = '../views/leaderboard.html';
     } else {
         cssToRemove = 'link[href="../css/dashboard.css"]';
         viewPage = '../views/login.html';
@@ -83,11 +86,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     newBody = newBody.replace('data.result.userId', data.result.userId);
                     newBody = newBody.replace('data.result.avatar', data.avatar);
                     newBody = newBody.replace('data.result.tokens', data.result.tokens || 0);
-                    newBody = newBody.replace('data.result.submissions', numberWithCommas(data.result.submissions) || 0);
-                    newBody = newBody.replace('data.result.views', numberWithCommas(data.result.views) || 0);
-                    newBody = newBody.replace('data.result.likes', numberWithCommas(data.result.likes) || 0);
-                    newBody = newBody.replace('data.result.watches', numberWithCommas(data.result.watches) || 0);
-                    newBody = newBody.replace('data.result.earned', numberWithCommas((data.result.submissions * 5) + data.result.tokens) || 0);
+                    newBody = newBody.replace('data.result.submissions', numberWithCommas(data.result.submissions || 0));
+                    newBody = newBody.replace('data.result.views', numberWithCommas(data.result.views || 0));
+                    newBody = newBody.replace('data.result.likes', numberWithCommas(data.result.likes || 0));
+                    newBody = newBody.replace('data.result.watches', numberWithCommas(data.result.watches || 0));
+                    newBody = newBody.replace('data.result.earned', numberWithCommas(((data.result.submissions * 5) + data.result.tokens) || 0));
                     $('page-content').html(newBody);
                     $('page-content').attr('page', 'statistics');
                 }
@@ -97,6 +100,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     newBody = newBody.replace('data.result.tokens', data.result.tokens || 0);
                     $('page-content').html(newBody);
                     $('page-content').attr('page', 'settings');
+                }
+                if (viewPage.includes('leaderboard')) {
+                    newBody = newBody.replace('data.result.userId', data.result.userId);
+                    newBody = newBody.replace('data.result.avatar', data.avatar);
+                    newBody = newBody.replace('data.result.tokens', data.result.tokens || 0);
+                    $('page-content').html(newBody);
+                    $('page-content').attr('page', 'leaderboard');
                 }
                 $(body).animate({ opacity: 1 }, 300);
             }

@@ -1,0 +1,21 @@
+.leaderboard-scrollable {
+    max-height: 406px;
+    overflow: auto;
+    width: 100%;
+    padding: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-clip: padding-box !important;
+    border: 3px solid transparent;
+    border-radius: 6px;
+    background: #6c43ff;
+}
+
+.leaderboard-scrollable .sub-header:first-of-type {
+    margin: 0;
+}
+
+.leaderboard-scrollable .container-content {
+    max-height: 158px;
+}

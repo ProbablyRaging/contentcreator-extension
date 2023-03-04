@@ -67,4 +67,17 @@ async function setupStatsPage() {
             }
         }, 300);
     });
+
+    const leaderboardLink = document.getElementById('leaderboardLink');
+    leaderboardLink.addEventListener('click', function () {
+        $('.main-btn').animate({ opacity: 0 }, 200);
+        $('.dashboard').animate({ opacity: 0 }, 200)
+            .promise().then(() => {
+                $('.body-bg').animate({ backgroundPositionY: '78px' }, 300);
+                $('.sub-buttons').animate({ bottom: '-46px' }, 300)
+                    .promise().then(() => {
+                        window.location = '../views/loader.html?data=' + encodeURIComponent('leaderboardNavBtn');
+                    });
+            });
+    });
 }

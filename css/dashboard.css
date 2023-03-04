@@ -222,6 +222,11 @@ input.error::placeholder {
     font-weight: 700;
 }
 
+.text-link {
+    color: #6c43ff;
+    cursor: pointer;
+}
+
 .nav-panel {
     display: flex;
     position: absolute;

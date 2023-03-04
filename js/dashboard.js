@@ -155,12 +155,14 @@ function presentVideoSubmissionInput(userId, submitVideoBtn) {
             .promise().then(() => {
                 $('#videoListContainer').animate({ maxHeight: '206px' }, 200);
                 $('.ext-info').animate({ bottom: '100px' }, 200);
+                $('.leaderboard-scrollable').animate({ maxHeight: '406px' }, 200)
             });
         $(submitVideoBtn).animate({ 'rotate': "0deg" }, 200)
             .css('background-color', '#6c43ff')
             .toggleClass('active');
     } else if (!submitVideoBtn.classList.contains('active') && !submitVideoBtn.classList.contains('submit')) {
         $('.ext-info').animate({ bottom: '148px' }, 200)
+        $('.leaderboard-scrollable').animate({ maxHeight: '338px' }, 200)
         $('#videoListContainer').animate({ maxHeight: '164px' }, 200)
             .promise().then(() => {
                 $('.input-container').animate({ opacity: 1 }, 200);

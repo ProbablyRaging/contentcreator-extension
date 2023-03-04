@@ -64,10 +64,10 @@
 }
 
 .sml {
-    font-size: 10px;
-    width: 120px;
-    height: 8px;
-    padding: 8px;
+    font-size: 10px !important;
+    width: 120px !important;
+    height: 8px !important;
+    padding: 8px !important;
 }
 
 .btn:hover {

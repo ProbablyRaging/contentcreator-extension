@@ -1,0 +1,61 @@
+<body>
+    <div id="dashboardFadeIn" class="dashboard">
+        <div class="header">
+            <p class="title">Leaderboards</p>
+            <div class="header-r">
+                <span id="tokenCount" class="token-count">data.result.tokens <img class="token-img" src="../assets/images/tokens.png"></span>
+                <img id="userAvatar" src="https://cdn.discordapp.com/avatars/data.result.userId/data.result.avatar.webp?size=256" onerror="this.src='../assets/images/default-avatar.png';">
+            </div>
+        </div>
+
+        <div class="leaderboard-scrollable">
+            <div class="sub-header">
+                <span>Videos Watched</span>
+            </div>
+            <div class="flex-container-alt">
+                <div id="loaderboardContainer" class="container-content">
+                    <div class="watches-lb-list">
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-header">
+                <span>Views Received</span>
+            </div>
+            <div class="flex-container-alt">
+                <div id="loaderboardContainer" class="container-content">
+                    <div class="views-lb-list">
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-header">
+                <span>Likes Received</span>
+            </div>
+            <div class="flex-container-alt">
+                <div id="loaderboardContainer" class="container-content">
+                    <div class="likes-lb-list">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <input id="submitInput" type="text" placeholder="Enter video URL or ID"></input>
+        </div>
+    </div>
+
+    <div class="nav-panel">
+        <button id="submitVideoBtn" class="main-btn"><i class="bi bi-plus"></i></button>
+        <div class="sub-buttons">
+            <div class="sub-buttons-l">
+                <i id="dashboardNavBtn" class="bi bi bi-house-door nav-button"></i>
+                <i id="statisticsNavBtn" class="bi bi bi-bar-chart nav-button"></i>
+            </div>
+            <div class="sub-buttons-r">
+                <i id="settingsNavBtn" class="bi bi bi-gear nav-button"></i>
+                <i id="logoutNavBtn" class="bi bi bi-door-closed nav-button logout-btn"></i>
+            </div>
+        </div>
+    </div>
+</body>
