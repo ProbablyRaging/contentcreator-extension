@@ -33,8 +33,11 @@ function fadeInNavBar() {
     setTimeout(() => {
         $('.body-bg').animate({ backgroundPositionY: '15px' }, 300)
             .promise().then(() => {
-                $('.main-btn').animate({ opacity: 1 }, 300);
-                $('.dashboard').animate({ opacity: 1 }, 300);
+                $('.main-btn').animate({ opacity: 1 }, 300)
+                    .css('pointer-events', 'all');
+                $('.dashboard').animate({ opacity: 1 }, 300)
+                    .css('pointer-events', 'all');
+                ;
             });
         $('.sub-buttons').animate({ bottom: '8px' }, 300);
     }, 300);
@@ -146,22 +149,24 @@ async function startVideoExpireTimer(expires, useCached) {
 
 function presentVideoSubmissionInput(userId, submitVideoBtn) {
     if (submitVideoBtn.classList.contains('active')) {
-        $('.input-sub-header').animate({ opacity: 0 }, 300);
-        $('.input-container').animate({ opacity: 0 }, 300);
-        $('#submitInput').animate({ opacity: 0 }, 300)
+        $('.input-container').animate({ opacity: 0 }, 200);
+        $('#submitInput').animate({ opacity: 0 }, 200)
+            .css('pointer-events', 'none')
             .promise().then(() => {
-                $('#videoListContainer').animate({ maxHeight: '200px' }, 200);
+                $('#videoListContainer').animate({ maxHeight: '206px' }, 200);
+                $('.ext-info').animate({ bottom: '100px' }, 200);
             });
         $(submitVideoBtn).animate({ 'rotate': "0deg" }, 200)
             .css('background-color', '#6c43ff')
             .toggleClass('active');
     } else if (!submitVideoBtn.classList.contains('active') && !submitVideoBtn.classList.contains('submit')) {
-        $('#videoListContainer').animate({ maxHeight: '122px' }, 200)
+        $('.ext-info').animate({ bottom: '148px' }, 200)
+        $('#videoListContainer').animate({ maxHeight: '164px' }, 200)
             .promise().then(() => {
-                $('.input-sub-header').animate({ opacity: 1 }, 300);
-                $('.input-container').animate({ opacity: 1 }, 300);
-                $('#submitInput').animate({ opacity: 1 }, 300);
-                $('#submitInput').focus();
+                $('.input-container').animate({ opacity: 1 }, 200);
+                $('#submitInput').animate({ opacity: 1 }, 200)
+                    .css('pointer-events', 'all')
+                    .focus();
             });
         $(submitVideoBtn).animate({ 'rotate': "135deg" }, 200)
             .css('background-color', '#ff3e3e')
@@ -176,7 +181,6 @@ function presentVideoSubmissionInput(userId, submitVideoBtn) {
 
 function reactToNavButton(userId, buttonName) {
     if (buttonName === 'logoutNavBtn') {
-        console.log('boop');
         $.ajax({
             url: 'http://54.79.93.12/api/logout',
             type: 'POST',
@@ -221,7 +225,7 @@ function processVideoSubmission(userId, inputText, submitInput) {
                 setTimeout(() => {
                     submitInput.classList.remove('error');
                     submitInput.placeholder = 'Enter video URL or ID';
-                }, 15000);
+                }, 7000);
                 startVideoExpireTimer(null, true);
             } else if (res.error) {
                 submitInput.classList.add('error');
@@ -235,7 +239,7 @@ function processVideoSubmission(userId, inputText, submitInput) {
                 setTimeout(() => {
                     submitInput.classList.remove('error');
                     submitInput.placeholder = 'Enter video URL or ID';
-                }, 15000);
+                }, 7000);
             }
         },
         error: function () {
@@ -250,7 +254,7 @@ function processVideoSubmission(userId, inputText, submitInput) {
             setTimeout(() => {
                 submitInput.classList.remove('error');
                 submitInput.placeholder = 'Enter video URL or ID';
-            }, 15000);
+            }, 7000);
         }
     });
 }

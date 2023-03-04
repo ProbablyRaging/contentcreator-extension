@@ -22,6 +22,7 @@
 
 .content {
     opacity: 0;
+    pointer-events: none;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -100,6 +101,7 @@
 
 .footer {
     opacity: 0;
+    pointer-events: none;
     display: flex;
     justify-content: center;
     position: absolute;

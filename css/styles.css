@@ -83,25 +83,6 @@ p {
     height: 100%;
 }
 
-.loader {
-    border: 2px solid #fff;
-    border-radius: 50%;
-    border-top: 2px solid #1168a2;
-    width: 24px;
-    height: 24px;
-    animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
 .tooltip {
     font-size: 12px;
 }
@@ -269,4 +250,14 @@ p {
 
 .modal-dialog {
     z-index: 2;
+}
+
+.alert {
+    width: 80%;
+    line-height: 0;
+    margin: 0;
+}
+
+.alert-dismissible .btn-close {
+    padding: 10px 16px;
 }

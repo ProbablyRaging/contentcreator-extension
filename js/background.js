@@ -91,7 +91,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
     // If the like but was clicked successfully
     if (message.videoLiked) {
-        console.log(`3`, message.tabId);
         incrementLikeCount(message.tabId, message.videoId);
     }
     // If the user isn't signed in to youtube
@@ -456,7 +455,6 @@ function incrementWatchCount(tabId, videoId) {
 }
 
 function incrementLikeCount(tabId, videoId) {
-    console.log(`1`, tabId);
     // Check if the tab is still open
     chrome.tabs.get(tabId, async function (tab) {
         if (chrome.runtime.lastError) return;

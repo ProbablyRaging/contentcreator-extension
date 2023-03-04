@@ -57,7 +57,22 @@
     box-sizing: border-box;
 }
 
+.switch-wrapper-alt {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
 .switch-wrapper .bi {
+    margin-left: 6px;
+    font-size: 12px;
+    color: rgb(150, 150, 150);
+    cursor: default;
+}
+
+.switch-wrapper-alt .bi {
     margin-left: 6px;
     font-size: 12px;
     color: rgb(150, 150, 150);
@@ -67,6 +82,10 @@
 .switch-label {
     display: flex;
     align-items: center;
+}
+
+.switch-wrapper-alt .switch-label {
+    margin-bottom: 4px;
 }
 
 .notifications-alt .switch-label {
@@ -98,6 +117,27 @@
 
 .form-switch .form-check-input {
     background-image: url('../assets/images/button-inner-disabled.svg');
+}
+
+.form-range {
+    margin-bottom: 6px;
+}
+
+.range-value {
+    position: absolute;
+    right: 30;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    background-color: #76767676;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    background-color: #6c43ff;
+}
+
+input[type=range]::-webkit-slider-thumb:active {
+    background-color: #6c43ff;
 }
 
 .help-link {

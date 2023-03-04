@@ -1,5 +1,6 @@
 .dashboard {
     opacity: 0;
+    pointer-events: none;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -157,7 +158,7 @@
     font-weight: 400;
     padding: 0px 16px;
     width: 100%;
-    max-height: 200px;
+    max-height: 206px;
     overflow: auto;
 }
 
@@ -183,23 +184,13 @@
     border-bottom: 1px solid #e5e5e5;
 }
 
-.input-sub-header {
-    opacity: 0;
-    display: flex;
-    justify-content: space-between;
-    position: absolute;
-    bottom: 150px;
-    width: 94%;
-    margin-top: 32px;
-    color: #9d9d9d;
-}
-
 .input-container {
     opacity: 0;
     display: flex;
     position: absolute;
     bottom: 105px;
     width: 94%;
+    pointer-events: none;
 }
 
 .input-container input {
@@ -241,6 +232,7 @@ input.error::placeholder {
 
 .main-btn {
     opacity: 0;
+    pointer-events: none;
     width: 56px;
     height: 56px;
     position: absolute;

@@ -5,7 +5,6 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
     }
     // Check if an ad is playing
     if (message.checkForAds) {
-        console.log(`2`, message.tabId);
         checkIfAdPlaying(message.tabId, message.reversed);
     }
     // Block tab interaction
@@ -24,7 +23,6 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
 
 let likeButtonRetries = 0;
 function findAndClickLikeButton(tabId, videoId) {
-    console.log(`3`, tabId);
     if (likeButtonRetries >= 30) return;
     const likeButton = document.querySelector('[aria-label*="like this video along with"]');
     if (likeButton) {
@@ -62,7 +60,7 @@ function checkIfAdPlaying(tabId, reversed) {
 
 let durationRetries = 0;
 async function getVideoDuration(tabId, reversed) {
-    const { playFull } = await chrome.storage.sync.get(['playFull']);
+    const { playLength } = await chrome.storage.sync.get(['playLength']);
     // Fallback if we can't find a duration
     if (durationRetries >= 15) {
         durationRetries = 0;
@@ -85,8 +83,15 @@ async function getVideoDuration(tabId, reversed) {
             const seconds = parseInt(secondsStr, 10);
             durationMs = (hours * 3600 + minutes * 60 + seconds) * 1000;
         }
-        // If the play full video option is enabled
-        if (playFull) return durationMs;
+        // If the user has selected a custom play length
+        if (playLength && playLength === 'Full') return chrome.runtime.sendMessage({ videoDuration: durationMs, tabId: tabId, reversed: reversed });
+        if (playLength && playLength <= durationMs) {
+            chrome.runtime.sendMessage({ videoDuration: playLength, tabId: tabId, reversed: reversed });
+            return;
+        } else if (playLength && playLength >= durationMs) {
+            chrome.runtime.sendMessage({ videoDuration: durationMs, tabId: tabId, reversed: reversed });
+            return;
+        }
         // Limit the duration to 10 minutes
         const returnedDuration = durationMs > 600000 ? 600000 : durationMs;
         chrome.runtime.sendMessage({ videoDuration: returnedDuration, tabId: tabId, reversed: reversed });

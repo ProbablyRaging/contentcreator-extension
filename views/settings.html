@@ -45,24 +45,20 @@
 
                             <div class="div-divider"></div>
 
-                            <div class="switch-wrapper">
-                                <p class="switch-label">Play Full Video <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Play videos for the full length"></i></p>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="playFullSwitch">
-                                </div>
+                            <div class="switch-wrapper-alt">
+                                <p class="switch-label">Play Video For <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="Choose how long you would like to play videos for"></i></p>
+                                <p id="rangeValue" class="range-value">0 minutes</p>
+                                <input id="playLengthRange" type="range" class="form-range" min="1" max="6" step="1">
                             </div>
                         </div>
                     </div>
-                    <p id="extInfo" class="ext-info"></p>
                 </div>
             </div>
         </div>
 
         <p id="helpLink" class="help-link">Need help?</p>
+        <p id="extInfo" class="ext-info"></p>
 
-        <div class="sub-header input-sub-header">
-            <span id="submitVideo">Submit Video</span>
-        </div>
         <div class="input-container">
             <input id="submitInput" type="text" placeholder="Enter video URL or ID"></input>
         </div>

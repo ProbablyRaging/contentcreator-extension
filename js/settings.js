@@ -17,12 +17,6 @@ function checkSettingsPage() {
     reCheck();
 }
 
-async function setUserAvatar() {
-    const userAvatar = document.getElementById('userAvatar');
-    const { userAvatarUrl } = await chrome.storage.sync.get(['userAvatarUrl']);
-    userAvatar.src = userAvatarUrl;
-}
-
 async function setupSettingsPage() {
     // Fade out and replace background
     fadeInNavBar();
@@ -31,13 +25,16 @@ async function setupSettingsPage() {
     const { discordNotification } = await chrome.storage.sync.get(['discordNotification']);
     const { browserNotification } = await chrome.storage.sync.get(['browserNotification']);
     const { muteQueue } = await chrome.storage.sync.get(['muteQueue']);
-    const { playFull } = await chrome.storage.sync.get(['playFull']);
+    const { playLength } = await chrome.storage.sync.get(['playLength']);
+    const { playLengthValue } = await chrome.storage.sync.get(['playLengthValue']);
     const notificationsSwitch = document.getElementById("notificationsSwitch");
     const notificationsAlt = document.getElementById("notificationsAlt");
     const discordSwitch = document.getElementById("discordSwitch");
     const browserSwitch = document.getElementById("browserSwitch");
     const muteQueueSwitch = document.getElementById("muteQueueSwitch");
-    const playFullSwitch = document.getElementById("playFullSwitch");
+    const playLengthRange = document.getElementById("playLengthRange");
+    const rangeValue = document.getElementById('rangeValue');
+
 
     const { userId } = await chrome.storage.sync.get(['userId']);
 
@@ -54,9 +51,6 @@ async function setupSettingsPage() {
             reactToNavButton(userId, buttonName);
         });
     });
-
-    // Set user avatar
-    setUserAvatar();
 
     // When a user clicks the submit video button
     const submitVideoBtn = document.getElementById('submitVideoBtn');
@@ -138,20 +132,19 @@ async function setupSettingsPage() {
             }
         });
     });
-    playFull ? playFullSwitch.checked = true : playFullSwitch.checked = false;
-    playFullSwitch.addEventListener('click', function () {
-        chrome.storage.sync.get(['playFull'], async result => {
-            if (result.playFull) {
-                await chrome.storage.sync.set({ playFull: false });
-            } else {
-                await chrome.storage.sync.set({ playFull: true });
-            }
-        });
+    playLengthValue ? playLengthRange.value = playLengthValue : playLengthRange.value = 1;
+    playLength ? rangeValue.innerText = playLengthValue === '6' ? `Full Length` : `${playLength / 1000 / 60} minutes` : rangeValue.value = 10000;
+    playLengthRange.addEventListener('input', function () {
+        const plValue = playLengthRange.value;
+        const values = [600000, 900000, 1200000, 1500000, 1800000, 'Full'];
+        const valueToMs = values[plValue - 1];
+        chrome.storage.sync.set({ playLength: valueToMs, playLengthValue: plValue });
+        rangeValue.innerText = plValue === '6' ? `Full Length` : `${valueToMs / 1000 / 60} minutes`;
     });
 
     const helpLink = document.getElementById('helpLink');
     helpLink.addEventListener('click', function () {
-        chrome.tabs.create({ url: chrome.runtime.getURL('../views/help.html') });
+        chrome.tabs.create({ url: 'https://forthecontent.xyz/extguide' });
     });
 
     // Get OS and extension version
