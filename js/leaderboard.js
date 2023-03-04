@@ -17,11 +17,59 @@ function checkleaderboardPage() {
     reCheck();
 }
 
+function fetchUserDataAndPopulateLeaderboards(userId) {
+    $.ajax({
+        url: 'http://54.79.93.12/api/getusers',
+        type: 'get',
+        success: function (res) {
+            chrome.storage.local.set({ cachedUserData: res });
+            populateLeaderboard(userId, res.watches, 'watches');
+            populateLeaderboard(userId, res.views, 'views');
+            populateLeaderboard(userId, res.likes, 'likes');
+            const oneHour = 60 * 60 * 1000;
+            chrome.storage.sync.set({ nextlbPopulateTimestamp: new Date().valueOf() + oneHour });
+        }
+    });
+}
+
+async function populateLeaderboard(userId, data, className, useCached) {
+    if (useCached) {
+        const list = $(`.${className}-lb-list`);
+        $.each(data.slice(0, 50), function (index, item) {
+            if (item.userId === '837447568422076456' || item.userId === '1003256013434134548') return;
+            // For each item in the data, we create a new list item and add it to the list
+            const listItem = $('<div class="video-item">')
+                .html(`<span id="index">${index + 1}</span>
+                        <span id="username">${item.username}</span>
+                        <span id="watches" ${userId === item.userId ? 'style="color: #6c43ff;"' : ''}><i class="bi bi bi-eye-fill"></i> ${item[className] || 0}</span>`);
+            // Append formatted item to list
+            list.append(listItem);
+        });
+        // Finally, we append the list to a container element in the HTML
+        $(`.${className}-lb-list`).append(list);
+    } else {
+        const list = $(`.${className}-lb-list`);
+        $.each(data.slice(0, 50), function (index, item) {
+            if (item.userId === '837447568422076456' || item.userId === '1003256013434134548') return;
+            // For each item in the data, we create a new list item and add it to the list
+            const listItem = $('<div class="video-item">')
+                .html(`<span id="index">${index + 1}</span>
+                        <span id="username">${item.username}</span>
+                        <span id="watches" ${userId === item.userId ? 'style="color: #6c43ff;"' : ''}><i class="bi bi bi-eye-fill"></i> ${item[className] || 0}</span>`);
+            // Append formatted item to list
+            list.append(listItem);
+        });
+        // Finally, we append the list to a container element in the HTML
+        $(`.${className}-lb-list`).append(list);
+    }
+}
+
 async function setupleaderboardPage() {
     // Fade out and replace background
     fadeInNavBar();
 
     const { userId } = await chrome.storage.sync.get(['userId']);
+    const { nextlbPopulateTimestamp } = await chrome.storage.sync.get(['nextlbPopulateTimestamp']);
 
     // Add event listeners to nav buttons
     const navButtons = [
@@ -68,55 +116,13 @@ async function setupleaderboardPage() {
         }, 300);
     });
 
-    // Video data
-    $.ajax({
-        url: 'http://54.79.93.12/api/getusers',
-        type: 'get',
-        success: function (res) {
-            // Watches leaderboard
-            const watchesList = $('.watches-lb-list');
-            let actualIndex = 0;
-            $.each(res.watches.slice(0, 50), function (index, item) {
-                if (item.userId === '837447568422076456' || item.userId === '1003256013434134548') return;
-                // For each item in the data, we create a new list item and add it to the list
-                const listItem = $('<div class="video-item">')
-                    .html(`<span id="index">${actualIndex + 1 }</span>
-                    <span id="username">${item.username}</span>
-                    <span id="watches" ${userId === item.userId ? 'style="color: #6c43ff;"' : ''}><i class="bi bi bi-eye-fill"></i> ${item.watches || 0}</span>`)
-                // Append formatted item to list
-                watchesList.append(listItem);
-                actualIndex++;
-            });
-            // Finally, we append the list to a container element in the HTML
-            $('.watches-lb-list').append(watchesList);
-
-            // Watches leaderboard
-            const viewsList = $('.views-lb-list');
-            $.each(res.views.slice(0, 50), function (index, item) {
-                // For each item in the data, we create a new list item and add it to the list
-                const listItem = $('<div class="video-item">')
-                    .html(`<span id="index">${index + 1}</span>
-                                <span id="username">${item.username}</span>
-                                <span id="watches" ${userId === item.userId ? 'style="color: #6c43ff;"' : ''}><i class="bi bi bi-eye-fill"></i> ${item.views || 0}</span>`)
-                // Append formatted item to list
-                viewsList.append(listItem);
-            });
-            // Finally, we append the list to a container element in the HTML
-            $('.views-lb-list').append(viewsList);
-
-            // Likes leaderboard
-            const likesList = $('.likes-lb-list');
-            $.each(res.likes.slice(0, 50), function (index, item) {
-                // For each item in the data, we create a new list item and add it to the list
-                const listItem = $('<div class="video-item">')
-                    .html(`<span id="index">${index + 1}</span>
-                                <span id="username">${item.username}</span>
-                                <span id="watches" ${userId === item.userId ? 'style="color: #6c43ff;"' : ''}><i class="bi bi bi-eye-fill"></i> ${item.likes || 0}</span>`)
-                // Append formatted item to list
-                likesList.append(listItem);
-            });
-            // Finally, we append the list to a container element in the HTML
-            $('.likes-lb-list').append(likesList);
-        }
-    });
+    // Fetch fresh page data or used a cached version 
+    if (!nextlbPopulateTimestamp || new Date().valueOf() > nextlbPopulateTimestamp) {
+        fetchUserDataAndPopulateLeaderboards(userId);
+    } else {
+        const { cachedUserData } = await chrome.storage.local.get(['cachedUserData']);
+        populateLeaderboard(userId, cachedUserData.watches, 'watches', true);
+        populateLeaderboard(userId, cachedUserData.views, 'views', true);
+        populateLeaderboard(userId, cachedUserData.likes, 'likes', true);
+    }
 }

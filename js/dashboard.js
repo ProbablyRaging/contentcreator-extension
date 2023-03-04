@@ -49,7 +49,7 @@ function fetchDataAndPopulatePage(userId) {
         url: 'http://54.79.93.12/api/videolist',
         type: 'get',
         success: function (res) {
-            chrome.storage.sync.set({ cachedVideoData: res });
+            chrome.storage.local.set({ cachedVideoData: res });
             setVideoAndWatchCount(res.videoList.length, res.watchCount);
             populateVideoListContainer(userId, res.videoList);
             const oneHour = 60 * 60 * 1000;
@@ -60,7 +60,7 @@ function fetchDataAndPopulatePage(userId) {
 
 async function setVideoAndWatchCount(videoListCount, watchCount, useCached) {
     if (useCached) {
-        const { cachedVideoData } = await chrome.storage.sync.get(['cachedVideoData']);
+        const { cachedVideoData } = await chrome.storage.local.get(['cachedVideoData']);
         const videoListCountEl = document.getElementById('videoListCount');
         videoListCountEl.innerHTML = `${cachedVideoData.videoList.length} <i class="bi bi-camera-video-fill"></i>`;
         const watchCountEl = document.getElementById('watchCount');
@@ -75,7 +75,7 @@ async function setVideoAndWatchCount(videoListCount, watchCount, useCached) {
 
 async function populateVideoListContainer(userId, videoList, useCached) {
     if (useCached) {
-        const { cachedVideoData } = await chrome.storage.sync.get(['cachedVideoData']);
+        const { cachedVideoData } = await chrome.storage.local.get(['cachedVideoData']);
         const currentQueue = document.getElementById('currentQueue');
         currentQueue.innerHTML = `Current Queue (${cachedVideoData.videoList.length})`
         const emptyList = $('.video-list');
