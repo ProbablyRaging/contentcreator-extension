@@ -111,6 +111,11 @@
     font-size: 90px;
 }
 
+.flex-container .bi-rocket-takeoff-fill {
+    font-size: 60px;
+    margin-right: 12px;
+}
+
 .container-content {
     font-size: 12px;
     font-weight: 400;

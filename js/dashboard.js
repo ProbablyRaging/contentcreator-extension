@@ -200,12 +200,14 @@ async function resetQueueButtonWith() {
     const playQueueBtn = document.getElementById('playQueueBtn');
     const videoListCountEl = document.getElementById('videoListCount');
     const watchCountEl = document.getElementById('watchCount');
+    const playBtnIcon = document.getElementById('playBtnIcon');
     const { cachedVideoData } = await chrome.storage.local.get(['cachedVideoData']);
     playQueueBtn.disabled = false;
     queueStatus.innerText = 'Play Queue';
     videoListCountEl.innerHTML = `${cachedVideoData.videoList.length} <i class="bi bi-camera-video-fill"></i>`;
     watchCountEl.style.display = 'flex';
     watchCountEl.innerHTML = `${cachedVideoData.watchCount} <i class="bi bi bi-eye-fill"></i>`;
+    playBtnIcon.innerHTML = '<i class="bi bi-play-fill"></i>';
 }
 
 function reactToNavButton(userId, buttonName) {
@@ -314,11 +316,14 @@ async function setupDashboardPage() {
             if (chrome.runtime.lastError) return;
         });
         playQueueBtn.disabled = true;
-        $(queueStatus).animate({ opacity: 0 }, 100)
-            .promise().then(() => {
-                $(queueStatus).text('Queue is playing')
-                $(queueStatus).animate({ opacity: 1 }, 100)
-            });
+        $(queueStatus).fadeOut(300, function () {
+            $(this).text('Queue is playing')
+                .fadeIn(300);
+        });
+        $('#playBtnIcon').fadeOut(300, function () {
+            $(this).html('<i class="bi bi-rocket-takeoff-fill"></i>')
+                .fadeIn(300);
+        });
     });
 
     // Add event listeners to nav buttons
