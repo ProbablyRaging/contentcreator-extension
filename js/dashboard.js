@@ -1,5 +1,13 @@
 document.addEventListener('DOMContentLoaded', async () => {
     checkDashboardPage();
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.watchTimer) {
+            updateQueueButtonWithTimer(message.watchTimer);
+        }
+        if (message.watchTimerStop) {
+            resetQueueButtonWith();
+        }
+    });
 });
 
 function checkDashboardPage() {
@@ -179,6 +187,25 @@ function presentVideoSubmissionInput(userId, submitVideoBtn) {
         // Get the value of the input field and make post request
         processVideoSubmission(userId, inputText, submitInput);
     }
+}
+
+function updateQueueButtonWithTimer(timer) {
+    const videoListCountEl = document.getElementById('videoListCount');
+    const watchCountEl = document.getElementById('watchCount');
+    if (videoListCountEl) videoListCountEl.innerHTML = timer;
+    if (watchCountEl) watchCountEl.style.display = 'none'
+}
+
+async function resetQueueButtonWith() {
+    const playQueueBtn = document.getElementById('playQueueBtn');
+    const videoListCountEl = document.getElementById('videoListCount');
+    const watchCountEl = document.getElementById('watchCount');
+    const { cachedVideoData } = await chrome.storage.local.get(['cachedVideoData']);
+    playQueueBtn.disabled = false;
+    queueStatus.innerText = 'Play Queue';
+    videoListCountEl.innerHTML = `${cachedVideoData.videoList.length} <i class="bi bi-camera-video-fill"></i>`;
+    watchCountEl.style.display = 'flex';
+    watchCountEl.innerHTML = `${cachedVideoData.watchCount} <i class="bi bi bi-eye-fill"></i>`;
 }
 
 function reactToNavButton(userId, buttonName) {

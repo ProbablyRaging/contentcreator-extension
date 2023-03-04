@@ -80,7 +80,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             initWindowId = window.id;
             // Stop executing if the window is closed
             if (chrome.runtime.lastError) return;
+            // Play queue
             createQueueWindow(window, 7000);
+            // Start watch timer
+            startWatchTimer();
         });
     }
     // If a video duration is available
@@ -485,6 +488,42 @@ async function getVideoList() {
         // Return null if the response has no videoList
         return null;
     }
+}
+
+let activeWatchTimer;
+let watchTimer;
+function startWatchTimer() {
+    if (activeWatchTimer) return;
+    activeWatchTimer = true;
+    let upCount = 0;
+    watchTimer = setInterval(() => {
+        upCount++;
+        const date = new Date(upCount * 1000); // convert seconds to milliseconds
+        let hours = date.getUTCHours();
+        let minutes = date.getUTCMinutes();
+        let seconds = date.getUTCSeconds();
+        let timeString = '';
+        if (hours > 0) {
+            timeString += hours.toString().padStart(2, '0') + ':';
+        }
+        timeString += minutes.toString().padStart(2, '0') + ':';
+        timeString += seconds.toString().padStart(2, '0');
+        // Check if the window still exists
+        chrome.windows.get(initWindowId, { populate: false }, function (window) {
+            if (chrome.runtime.lastError || !window) {
+                // Window doesn't exist, stop monitoring
+                clearInterval(watchTimer);
+                activeWatchTimer = false;
+                chrome.runtime.sendMessage({ watchTimerStop: true }, function () {
+                    if (chrome.runtime.lastError) return;
+                });
+                return;
+            }
+        });
+        chrome.runtime.sendMessage({ watchTimer: timeString }, function () {
+            if (chrome.runtime.lastError) return;
+        });
+    }, 1000);
 }
 
 function createErrorWindow(initWindowId, errorMessage) {
