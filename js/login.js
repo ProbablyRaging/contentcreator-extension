@@ -49,6 +49,6 @@ function setupLoginPage() {
 
     const discordJoin = document.getElementById('discordJoin');
     discordJoin.addEventListener('click', function () {
-        chrome.tabs.create({ url: 'https://discord.gg/forthecontent' });
+        chrome.tabs.create({ url: 'https://discord.gg/contentcreator' });
     });
 }
