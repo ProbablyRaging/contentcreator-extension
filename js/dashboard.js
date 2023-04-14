@@ -341,13 +341,13 @@ async function setupDashboardPage() {
     });
 
     // Fetch fresh page data or used a cached version 
-    if (!nextPopulateTimestamp || new Date().valueOf() > nextPopulateTimestamp) {
+    // if (!nextPopulateTimestamp || new Date().valueOf() > nextPopulateTimestamp) {
         fetchDataAndPopulatePage(userId);
-    } else {
-        setVideoAndWatchCount(null, null, true);
-        populateVideoListContainer(userId, null, true);
-        startVideoExpireTimer(null, true);
-    }
+    // } else {
+    //     setVideoAndWatchCount(null, null, true);
+    //     populateVideoListContainer(userId, null, true);
+    //     startVideoExpireTimer(null, true);
+    // }
 
     // When a user clicks the submit video button
     const submitVideoBtn = document.getElementById('submitVideoBtn');
