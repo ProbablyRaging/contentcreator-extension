@@ -19,7 +19,7 @@ function checkleaderboardPage() {
 
 function fetchUserDataAndPopulateLeaderboards(userId) {
     $.ajax({
-        url: 'http://54.79.93.12/api/getusers',
+        url: 'https://creatordiscord.xyz/api/getusers',
         type: 'get',
         success: function (res) {
             chrome.storage.local.set({ cachedUserData: res });

@@ -54,7 +54,7 @@ function fadeInNavBar() {
 function fetchDataAndPopulatePage(userId) {
     // Video data
     $.ajax({
-        url: 'http://54.79.93.12/api/videolist',
+        url: 'https://creatordiscord.xyz/api/videolist',
         type: 'get',
         success: function (res) {
             chrome.storage.local.set({ cachedVideoData: res });
@@ -213,7 +213,7 @@ async function resetQueueButtonWith() {
 function reactToNavButton(userId, buttonName) {
     if (buttonName === 'logoutNavBtn') {
         $.ajax({
-            url: 'http://54.79.93.12/api/logout',
+            url: 'https://creatordiscord.xyz/api/logout',
             type: 'POST',
             data: {
                 userId: userId,
@@ -233,7 +233,7 @@ function reactToNavButton(userId, buttonName) {
 
 function processVideoSubmission(userId, inputText, submitInput) {
     $.ajax({
-        url: 'http://54.79.93.12/api/addvideo',
+        url: 'https://creatordiscord.xyz/api/addvideo',
         type: 'POST',
         data: {
             videoId: inputText,
@@ -342,7 +342,7 @@ async function setupDashboardPage() {
 
     // Fetch fresh page data or used a cached version 
     // if (!nextPopulateTimestamp || new Date().valueOf() > nextPopulateTimestamp) {
-        fetchDataAndPopulatePage(userId);
+    fetchDataAndPopulatePage(userId);
     // } else {
     //     setVideoAndWatchCount(null, null, true);
     //     populateVideoListContainer(userId, null, true);

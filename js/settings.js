@@ -144,7 +144,7 @@ async function setupSettingsPage() {
 
     const helpLink = document.getElementById('helpLink');
     helpLink.addEventListener('click', function () {
-        chrome.tabs.create({ url: 'https://forthecontent.xyz/extguide' });
+        chrome.tabs.create({ url: 'https://creatordiscord.xyz/extguide' });
     });
 
     // Get OS and extension version

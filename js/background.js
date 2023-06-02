@@ -26,7 +26,7 @@ setInterval(async () => {
             });
         }
         if (userId && discordNotification && !notificationSent) {
-            fetch('http://54.79.93.12/api/sendnotification', {
+            fetch('https://creatordiscord.xyz/api/sendnotification', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: userId })
@@ -54,7 +54,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.login) {
         // Create a popup window for Discord authentication
         chrome.windows.create({
-            url: 'https://discord.com/api/oauth2/authorize?client_id=977292001718464592&redirect_uri=http://54.79.93.12/auth/redirect&response_type=code&scope=guilds%20identify',
+            url: 'https://discord.com/api/oauth2/authorize?client_id=977292001718464592&redirect_uri=https://creatordiscord.xyz/auth/redirect&response_type=code&scope=guilds%20identify',
             focused: true,
             type: 'popup',
             width: 600,
@@ -70,7 +70,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Create a popup window for watching video queues
         const successMessage = 'Loading queue..';
         chrome.windows.create({
-            url: `http://54.79.93.12/success?message=${successMessage}`,
+            url: `https://creatordiscord.xyz/success?message=${successMessage}`,
             focused: true,
             width: 600,
             height: 800,
@@ -120,7 +120,7 @@ function checkAuthState(window) {
         if (tab.url.includes('auth/success?user')) {
             const params = new URLSearchParams(tab.url.split('?')[1]);
             const userId = params.get('user');
-            fetch('http://54.79.93.12/api/getuser', {
+            fetch('https://creatordiscord.xyz/api/getuser', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: userId })
@@ -177,7 +177,7 @@ async function createQueueWindow(window, delaySecondTab) {
             setTimeout(() => {
                 const successMessage = 'Loading reversed queue..';
                 chrome.tabs.create({
-                    url: `http://54.79.93.12/success?message=${successMessage}`,
+                    url: `https://creatordiscord.xyz/success?message=${successMessage}`,
                     windowId: window.id
                 }, async function (tab) {
                     if (chrome.runtime.lastError) return;
@@ -214,7 +214,7 @@ async function getQueueAndPlay(tabId, reversed) {
     if (!videoIds || videoIds.length < 1) {
         try {
             const errorMessage = 'There are currently no videos in the queue';
-            chrome.tabs.update(tabId, { url: `http://54.79.93.12/error?message=${errorMessage}` });
+            chrome.tabs.update(tabId, { url: `https://creatordiscord.xyz/error?message=${errorMessage}` });
         } catch (err) {
             console.log('There was a problem : ', err);
         }
@@ -264,7 +264,7 @@ function openTab(tabId, previousVideoId) {
             clearInterval(monitorCheck);
             clearInterval(monitorCheckTwo);
             const successMessage = 'You have reached the end of the queue';
-            chrome.tabs.update(tabId, { url: `http://54.79.93.12/success?message=${successMessage}` });
+            chrome.tabs.update(tabId, { url: `https://creatordiscord.xyz/success?message=${successMessage}` });
         } catch (err) {
             console.log('There was a problem : ', err);
         }
@@ -310,7 +310,7 @@ function openReversedTab(tabId, previousVideoId) {
             clearInterval(monitorCheck);
             clearInterval(monitorCheckTwo);
             const successMessage = 'You have reached the end of the queue';
-            chrome.tabs.update(tabId, { url: `http://54.79.93.12/success?message=${successMessage}` });
+            chrome.tabs.update(tabId, { url: `https://creatordiscord.xyz/success?message=${successMessage}` });
         } catch (err) {
             console.log('There was a problem : ', err);
         }
@@ -434,7 +434,7 @@ function awardToken(tabId) {
         // Retrieve the user ID from storage
         const { userId } = await chrome.storage.sync.get(['userId']);
         // Send a request to the server to add a token to the user's account
-        fetch('http://54.79.93.12/api/addtokens', {
+        fetch('https://creatordiscord.xyz/api/addtokens', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: userId, amount: 1 })
@@ -449,7 +449,7 @@ function incrementWatchCount(tabId, videoId) {
         // Retrieve the user ID from storage
         const { userId } = await chrome.storage.sync.get(['userId']);
         // Send a request to the server to increment the video's watch count
-        fetch('http://54.79.93.12/api/addwatch', {
+        fetch('https://creatordiscord.xyz/api/addwatch', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ videoId: videoId, amount: 1, userId: userId })
@@ -463,7 +463,7 @@ function incrementLikeCount(tabId, videoId) {
         if (chrome.runtime.lastError) return;
         // Retrieve the user ID from storage
         // Send a request to the server to increment the video's like count
-        fetch('http://54.79.93.12/api/addlike', {
+        fetch('https://creatordiscord.xyz/api/addlike', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ videoId: videoId, amount: 1 })
@@ -472,7 +472,7 @@ function incrementLikeCount(tabId, videoId) {
 }
 
 async function getVideoList() {
-    const response = await fetch('http://54.79.93.12/api/videolist', {
+    const response = await fetch('https://creatordiscord.xyz/api/videolist', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
     });
@@ -529,7 +529,7 @@ function startWatchTimer() {
 function createErrorWindow(initWindowId, errorMessage) {
     chrome.windows.remove(initWindowId)
     chrome.windows.create({
-        url: `http://54.79.93.12/error?message=${errorMessage}`,
+        url: `https://creatordiscord.xyz/error?message=${errorMessage}`,
         focused: true,
         type: 'panel',
         width: 600,
